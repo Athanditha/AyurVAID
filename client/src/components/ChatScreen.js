@@ -1,0 +1,352 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Bot, User, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
+import './ChatScreen.css';
+
+const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBackToDashboard, setConversationId }) => {
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [conversation, setConversation] = useState(null);
+  const [isLoading, setIsLoadingLocal] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (conversationId) {
+      loadConversation();
+    } else {
+      // Initialize with welcome message for new conversations
+      setMessages([
+        {
+          id: 1,
+          type: 'bot',
+          content: "Welcome to AyurVAID! I'm your premium Ayurvedic health intelligence advisor. Based on your personalized dosha analysis, I can provide expert recommendations for diet, lifestyle, exercise, and holistic wellness. How may I assist you today?",
+          timestamp: new Date()
+        }
+      ]);
+    }
+  }, [conversationId]);
+
+  const loadConversation = async () => {
+    if (!conversationId) return;
+    
+    setIsLoadingLocal(true);
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/api/conversations/${conversationId}`);
+      if (response.data.success) {
+        setConversation(response.data.conversation);
+        setMessages(response.data.conversation.messages || []);
+      }
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+    } finally {
+      setIsLoadingLocal(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      content: inputMessage,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoadingLocal(true);
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('/api/chat/message', {
+        conversationId: conversationId,
+        profileId: profileId,
+        message: inputMessage
+      });
+
+      if (response.data.success) {
+        // If we got a new conversation ID, update it
+        if (response.data.conversationId && !conversationId) {
+          setConversationId(response.data.conversationId);
+        }
+
+        const botMessage = {
+          id: Date.now() + 1,
+          type: 'bot',
+          content: response.data.response.message,
+          explanation: response.data.response.explanation,
+          doshaContext: response.data.response.doshaContext,
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        throw new Error('Failed to get response');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingLocal(false);
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const messageVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    }
+  };
+
+  return (
+    <div className="chat-container-full">
+      <div className="chat-messages">
+        <AnimatePresence>
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              className={`message ${message.type}-message`}
+              variants={messageVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="message-avatar">
+                {message.type === 'bot' ? <Bot size={20} /> : <User size={20} />}
+              </div>
+              <div className="message-content">
+                <p>{message.content}</p>
+                
+                {message.explanation && (
+                  <motion.div 
+                    className="explanation"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                  >
+                    <h5>🧠 Explainable AI Analysis</h5>
+                    
+                    {/* Main reasoning */}
+                    {message.explanation.reasoning && Array.isArray(message.explanation.reasoning) && (
+                      <div className="reasoning-section">
+                        <h6>Why this advice?</h6>
+                        <ul>
+                          {message.explanation.reasoning.map((reason, index) => (
+                            <li key={index}>• {reason}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Confidence and methodology */}
+                    <div className="explanation-meta">
+                      {message.explanation.confidence && (
+                        <div className="confidence-badge">
+                          <strong>Confidence:</strong> 
+                          <span className={`confidence-level ${message.explanation.confidence.toLowerCase().replace(' ', '-')}`}>
+                            {message.explanation.confidence}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {message.explanation.confidenceScore && (
+                        <div className="confidence-score">
+                          Score: {Math.round(message.explanation.confidenceScore * 100)}%
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Evidence-based information */}
+                    {message.explanation.evidenceBased && (
+                      <div className="evidence-section">
+                        <h6>📚 Evidence Base</h6>
+                        {message.explanation.evidenceBased.traditionalBasis && (
+                          <p><strong>Traditional Sources:</strong> {message.explanation.evidenceBased.traditionalBasis.join(', ')}</p>
+                        )}
+                        {message.explanation.evidenceBased.questionsAnalyzed && (
+                          <p><strong>Assessment Data:</strong> {message.explanation.evidenceBased.questionsAnalyzed} questions analyzed</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Research support */}
+                    {message.explanation.evidenceSupport && message.explanation.evidenceSupport.research && message.explanation.evidenceSupport.research.length > 0 && (
+                      <div className="research-section">
+                        <h6>🔬 Research Support</h6>
+                        {message.explanation.evidenceSupport.research.map((study, index) => (
+                          <div key={index} className="research-item">
+                            <p><strong>{study.study}</strong></p>
+                            <p>{study.finding}</p>
+                            <small>{study.relevance}</small>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Food details if available */}
+                    {message.explanation.foodDetails && (
+                      <div className="food-details-section">
+                        <h6>🥗 Food Analysis</h6>
+                        {message.explanation.foodDetails.map((food, index) => (
+                          <div key={index} className="food-item">
+                            <h7>{food.food}</h7>
+                            <ul>
+                              {food.whyRecommended.map((reason, rIndex) => (
+                                <li key={rIndex}>{reason}</li>
+                              ))}
+                            </ul>
+                            {food.ayurvedicProperties && (
+                              <div className="ayurvedic-properties">
+                                <small>
+                                  <strong>Properties:</strong> {food.ayurvedicProperties.qualities?.join(', ')} | 
+                                  <strong> Effect:</strong> {food.ayurvedicProperties.effect}
+                                </small>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Decision tree visualization */}
+                    {message.explanation.decisionTree && (
+                      <div className="decision-tree-section">
+                        <h6>🌳 Decision Process</h6>
+                        <div className="decision-tree">
+                          <div className="tree-root">{message.explanation.decisionTree.root}</div>
+                          {message.explanation.decisionTree.branches && message.explanation.decisionTree.branches.map((branch, index) => (
+                            <div key={index} className="tree-branch">
+                              <div className="branch-node">{branch.node}</div>
+                              <div className="branch-children">
+                                {branch.children.map((child, cIndex) => (
+                                  <div key={cIndex} className="tree-leaf">{child}</div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Methodology and transparency */}
+                    {message.explanation.methodology && (
+                      <div className="methodology-section">
+                        <h6>⚙️ Methodology</h6>
+                        <p>{message.explanation.methodology}</p>
+                      </div>
+                    )}
+
+                    {/* Data sources */}
+                    {message.explanation.sources && (
+                      <div className="sources-section">
+                        <h6>📖 Sources</h6>
+                        <div className="sources-list">
+                          {message.explanation.sources.map((source, index) => (
+                            <span key={index} className="source-tag">{source}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alternatives if available */}
+                    {message.explanation.alternatives && message.explanation.alternatives.length > 0 && (
+                      <div className="alternatives-section">
+                        <h6>🔄 Alternative Approaches</h6>
+                        {message.explanation.alternatives.map((alt, index) => (
+                          <div key={index} className="alternative-item">
+                            <strong>{alt.approach}:</strong> {alt.suggestion}
+                            <br /><small>{alt.rationale}</small>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Monitoring suggestions */}
+                    {message.explanation.monitoring && (
+                      <div className="monitoring-section">
+                        <h6>📊 Monitoring & Follow-up</h6>
+                        <p><strong>Timeframe:</strong> {message.explanation.monitoring.timeframe}</p>
+                        <p><strong>Track:</strong> {message.explanation.monitoring.indicators?.join(', ')}</p>
+                        <small>{message.explanation.monitoring.consultation}</small>
+                      </div>
+                    )}
+
+                    {/* Dosha context */}
+                    {message.doshaContext && message.doshaContext.whyThisAdvice && (
+                      <div className="dosha-context-section">
+                        <h6>🎯 Constitutional Context</h6>
+                        <p>{message.doshaContext.whyThisAdvice}</p>
+                        {message.doshaContext.seasonalContext && (
+                          <p><strong>Seasonal:</strong> {message.doshaContext.seasonalContext}</p>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+                
+                <div className="message-time">
+                  {new Date(message.timestamp).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="chat-input-container">
+        <div className="chat-input">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask me about your health, diet, lifestyle..."
+            disabled={isLoading}
+          />
+          <motion.button
+            className="btn btn-primary send-button"
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim() || isLoading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Send size={18} />
+          </motion.button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChatScreen;

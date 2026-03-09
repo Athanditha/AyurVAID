@@ -1,0 +1,33 @@
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(45, 80, 22, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: var(--pure-white);
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid var(--pure-white);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+}
+
+.loading-overlay p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}

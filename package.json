@@ -1,0 +1,44 @@
+{
+  "name": "ayurvaid",
+  "version": "1.0.0",
+  "description": "AyurVAID - Premium Ayurvedic Health Intelligence with AI-powered dosha analysis",
+  "main": "server/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/server.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install-client": "cd client && npm install",
+    "install-server": "npm install",
+    "install-all": "npm run install-server && npm run install-client",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.3",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "firebase-admin": "^13.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "openai": "^4.20.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "ayurvaid",
+    "ayurveda",
+    "health",
+    "ai",
+    "dosha",
+    "wellness",
+    "premium",
+    "react"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

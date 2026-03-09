@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.npm
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Firebase sensitive keys
+server/firebase-service-account.json
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
