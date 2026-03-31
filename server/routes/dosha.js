@@ -45,8 +45,8 @@ router.post('/analyze', async (req, res) => {
       });
     }
 
-    // Analyze the responses using weighted algorithm
-    const initialAnalysis = analyzer.analyzeResponses(responses);
+    // Analyze the responses using Machine Learning model
+    const initialAnalysis = await analyzer.analyzeResponses(responses);
 
     // Enrich with Explainable AI reasoning
     const explanation = explainableAI.generateExplanation(

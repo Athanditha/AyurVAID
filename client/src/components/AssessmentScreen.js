@@ -33,15 +33,15 @@ const AssessmentScreen = ({ onComplete, setIsLoading }) => {
   const handleOptionSelect = (optionIndex) => {
     const question = questions[currentQuestionIndex];
     const selectedOption = question.options[optionIndex];
-    
+
     const newResponses = [...responses];
     newResponses[currentQuestionIndex] = {
       questionId: question.id,
-      optionIndex: optionIndex,
-      dosha: selectedOption.dosha,
-      weight: selectedOption.weight
+      csvColumn: question.csvColumn,
+      value: selectedOption.value,
+      text: selectedOption.text
     };
-    
+
     setResponses(newResponses);
     setSelectedOption(optionIndex);
   };
@@ -102,7 +102,7 @@ const AssessmentScreen = ({ onComplete, setIsLoading }) => {
     <div className="assessment-content">
       <div className="progress-container">
         <div className="progress-bar">
-          <motion.div 
+          <motion.div
             className="progress-fill"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -130,7 +130,7 @@ const AssessmentScreen = ({ onComplete, setIsLoading }) => {
           <h3 className="question-text">
             {currentQuestion.question}
           </h3>
-          
+
           <div className="options">
             {currentQuestion.options.map((option, index) => (
               <motion.button
@@ -159,7 +159,7 @@ const AssessmentScreen = ({ onComplete, setIsLoading }) => {
           <ChevronLeft size={20} />
           Previous
         </button>
-        
+
         <button
           className="btn btn-primary"
           onClick={handleNext}

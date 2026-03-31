@@ -1,0 +1,127 @@
+{
+  "Body Frame": [
+    "Well Built",
+    "Thin and Lean",
+    "Medium"
+  ],
+  "Type of Hair": [
+    "Dry",
+    "Normal",
+    "Greasy"
+  ],
+  "Color of Hair": [
+    "Grey",
+    "Brown",
+    "Black"
+  ],
+  "Skin": [
+    "Soft,Sweating",
+    "Moist,Greasy",
+    "Dry,Rough"
+  ],
+  "Complexion": [
+    "Pinkish",
+    "Dark",
+    "Glowing"
+  ],
+  "Body Weight": [
+    "Underweight",
+    "Overweight",
+    "Normal"
+  ],
+  "Nails": [
+    "Redish",
+    "Blackish",
+    "Pinkish"
+  ],
+  "Size and Color of the Teeth": [
+    "Large,White",
+    "Medium,Yellowish",
+    "Irregular,Blackish"
+  ],
+  "Pace of Performing Work": [
+    "Fast",
+    "Medium",
+    "Slow"
+  ],
+  "Mental Activity": [
+    "Aggressive",
+    "Restless",
+    "Stable"
+  ],
+  "Memory": [
+    "Good Memory",
+    "Long Term",
+    "Short term"
+  ],
+  "Sleep Pattern": [
+    "Sleepy",
+    "Moderate",
+    "Less"
+  ],
+  "Weather Conditions": [
+    "Dislike Heat",
+    "Dislike Moist",
+    "Dislike Cold"
+  ],
+  "Reaction under Adverse Situations": [
+    "Anger",
+    "Calm",
+    "Anxiety"
+  ],
+  "Mood": [
+    "Changes Quickly",
+    "Constant",
+    "Changes Slowly"
+  ],
+  "Eating Habit": [
+    "Irregular Chewing",
+    "Improper Chewing",
+    "Proper Chewing"
+  ],
+  "Hunger": [
+    "Skips Meal",
+    "Sudden and Sharp",
+    "Irregular"
+  ],
+  "Body Temperature": [
+    "Less than Normal",
+    "Normal",
+    "More than Normal"
+  ],
+  "Joints": [
+    "Weak",
+    "Heavy",
+    "Healthy"
+  ],
+  "Nature": [
+    "Forgiving,Grateful",
+    "Jealous,Fearful",
+    "Egoistic,Fearless"
+  ],
+  "Body Energy": [
+    "Medium",
+    "Low",
+    "High"
+  ],
+  "Quality of Voice": [
+    "Deep",
+    "Fast",
+    "Rough"
+  ],
+  "Dreams": [
+    "Sky",
+    "Fire",
+    "Water"
+  ],
+  "Social Relations": [
+    "Ambivert",
+    "Introvert",
+    "Extrovert"
+  ],
+  "Body Odor": [
+    "Strong",
+    "Negligible",
+    "Mild"
+  ]
+}

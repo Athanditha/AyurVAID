@@ -1,58 +1,100 @@
+const { spawn } = require('child_process');
+const path = require('path');
 const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 
 class DoshaAnalyzer {
   constructor() {
-    // Use the comprehensive knowledge base
+    this.pythonScriptPath = path.join(__dirname, '../python/predict_models.py');
     this.doshaDescriptions = ayurvedicKnowledge.doshaProfiles;
   }
 
-  analyzeResponses(responses) {
-    const scores = { vata: 0, pitta: 0, kapha: 0 };
-    const totalWeight = responses.reduce((sum, response) => sum + response.weight, 0);
+  async analyzeResponses(responses) {
+    try {
+      // 1. Convert responses (Array of { csvColumn, value }) to a dictionary
+      const inputData = {};
+      responses.forEach(r => {
+        if (r.csvColumn && r.value) {
+          inputData[r.csvColumn] = r.value;
+        }
+      });
 
-    // Calculate weighted scores
-    responses.forEach(response => {
-      scores[response.dosha] += response.weight;
-    });
+      console.log('Sending to ML Model:', inputData);
 
-    // Convert to percentages
-    const percentages = {
-      vata: Math.round((scores.vata / totalWeight) * 100),
-      pitta: Math.round((scores.pitta / totalWeight) * 100),
-      kapha: Math.round((scores.kapha / totalWeight) * 100)
-    };
+      // 2. Call the Python Inference Script
+      const predictionResponse = await this.runPythonPrediction(inputData);
+      
+      if (!predictionResponse.success) {
+        throw new Error(predictionResponse.error || "Model prediction failed");
+      }
 
-    // Determine primary and secondary doshas
-    const sortedDoshas = Object.entries(percentages)
-      .sort(([,a], [,b]) => b - a)
-      .map(([dosha, percentage]) => ({ dosha, percentage }));
+      console.log('ML Prediction successful:', predictionResponse.primary);
 
-    const primary = sortedDoshas[0];
-    const secondary = sortedDoshas[1];
+      const primary = predictionResponse.primary;
+      const secondary = predictionResponse.secondary;
 
-    // Determine constitution type
-    let constitutionType;
-    if (primary.percentage >= 60) {
-      constitutionType = `Single Dosha (${primary.dosha.charAt(0).toUpperCase() + primary.dosha.slice(1)})`;
-    } else if (primary.percentage >= 40 && secondary.percentage >= 30) {
-      constitutionType = `Dual Dosha (${primary.dosha.charAt(0).toUpperCase() + primary.dosha.slice(1)}-${secondary.dosha.charAt(0).toUpperCase() + secondary.dosha.slice(1)})`;
-    } else {
-      constitutionType = "Tri-Dosha (Balanced)";
+      // 3. Construct unified response format expected by frontend
+      return {
+        scores: predictionResponse.scores, // e.g. { vata: 20, pitta: 70, kapha: 10 }
+        primary: primary,
+        secondary: secondary,
+        constitutionType: predictionResponse.constitutionType,
+        confidence: predictionResponse.confidence,
+        engine: predictionResponse.engine,
+        comparative_rf_scores: predictionResponse.comparative_rf_scores,
+        profile: this.generateProfile(predictionResponse.scores, primary, secondary),
+        recommendations: this.generateRecommendations(primary)
+      };
+
+    } catch (error) {
+      console.error('Error in ML DoshaAnalyzer:', error);
+      throw error;
     }
+  }
 
-    return {
-      scores: percentages,
-      primary: primary.dosha,
-      secondary: secondary.dosha,
-      constitutionType,
-      profile: this.generateProfile(percentages, primary.dosha, secondary.dosha),
-      recommendations: this.generateRecommendations(percentages, primary.dosha)
-    };
+  runPythonPrediction(inputData) {
+    return new Promise((resolve, reject) => {
+      const pythonProcess = spawn('python', [
+        this.pythonScriptPath,
+        JSON.stringify(inputData)
+      ]);
+
+      let outputData = '';
+      let errorData = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        outputData += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        errorData += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          return reject(new Error(`Python process exited with code ${code}. Error: ${errorData}`));
+        }
+        
+        try {
+          // Parse precisely the JSON response logged by Python
+          // (Python might occasionally log standard warnings, so we extract just the JSON)
+          const jsonMatch = outputData.match(/\{.*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            resolve(parsed);
+          } else {
+            console.warn('Raw Python output:', outputData);
+            resolve(JSON.parse(outputData));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse Python output: ${e.message}\nRaw Data: ${outputData}`));
+        }
+      });
+    });
   }
 
   generateProfile(percentages, primary, secondary) {
-    const primaryDesc = this.doshaDescriptions[primary];
-    const secondaryDesc = this.doshaDescriptions[secondary];
+    const primaryDesc = this.doshaDescriptions[primary] || this.doshaDescriptions['vata'];
+    const secondaryDesc = this.doshaDescriptions[secondary] || this.doshaDescriptions['pitta'];
 
     return {
       constitution: {
@@ -72,51 +114,15 @@ class DoshaAnalyzer {
     };
   }
 
-  generateRecommendations(percentages, primary) {
-    const primaryDesc = this.doshaDescriptions[primary];
+  generateRecommendations(primary) {
+    const primaryDesc = this.doshaDescriptions[primary] || this.doshaDescriptions['vata'];
     
     return {
-      lifestyle: Object.values(primaryDesc.lifestyle),
-      dietary: primaryDesc.balancingFoods,
-      exercise: ayurvedicKnowledge.yogaPractices[primary],
-      mentalWellness: ayurvedicKnowledge.mentalHealth[primary].practices
+      lifestyle: primaryDesc.lifestyle ? Object.values(primaryDesc.lifestyle) : [],
+      dietary: primaryDesc.balancingFoods || { favor: [], avoid: [] },
+      exercise: ayurvedicKnowledge.yogaPractices[primary] || [],
+      mentalWellness: ayurvedicKnowledge.mentalHealth[primary]?.practices || []
     };
-  }
-
-  getDietaryRecommendations(primary) {
-    const recommendations = {
-      vata: {
-        favor: ["Warm, cooked foods", "Sweet, sour, salty tastes", "Healthy fats and oils", "Regular meal times"],
-        avoid: ["Cold, raw foods", "Excessive bitter, pungent, astringent", "Irregular eating", "Too much caffeine"]
-      },
-      pitta: {
-        favor: ["Cool, fresh foods", "Sweet, bitter, astringent tastes", "Plenty of water", "Moderate portions"],
-        avoid: ["Spicy, hot foods", "Excessive sour, salty, pungent", "Alcohol", "Eating when angry"]
-      },
-      kapha: {
-        favor: ["Light, warm foods", "Pungent, bitter, astringent tastes", "Spices and herbs", "Smaller portions"],
-        avoid: ["Heavy, oily foods", "Excessive sweet, sour, salty", "Cold drinks", "Overeating"]
-      }
-    };
-    return recommendations[primary];
-  }
-
-  getExerciseRecommendations(primary) {
-    const recommendations = {
-      vata: ["Gentle yoga", "Walking", "Swimming", "Tai chi", "Avoid overexertion"],
-      pitta: ["Moderate intensity", "Swimming", "Cycling", "Team sports", "Avoid competitive stress"],
-      kapha: ["Vigorous exercise", "Running", "Weight training", "High-intensity workouts", "Daily movement essential"]
-    };
-    return recommendations[primary];
-  }
-
-  getMentalWellnessRecommendations(primary) {
-    const recommendations = {
-      vata: ["Regular meditation", "Grounding practices", "Consistent routine", "Calming music", "Avoid overstimulation"],
-      pitta: ["Cooling practices", "Stress management", "Avoid perfectionism", "Nature walks", "Moderate goals"],
-      kapha: ["Stimulating activities", "New experiences", "Social engagement", "Energizing practices", "Avoid isolation"]
-    };
-    return recommendations[primary];
   }
 }
 

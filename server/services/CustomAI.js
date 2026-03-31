@@ -44,7 +44,7 @@ class CustomAI {
       const userMessage = messages[messages.length - 1].content.toLowerCase();
       const intent = this.classifyIntent(userMessage);
       const context = this.extractContext(userMessage);
-      
+
       let response = '';
       let explanation = {};
 
@@ -130,7 +130,7 @@ class CustomAI {
   generatePersonalizedResponse(intent, context, doshaProfile, userMessage) {
     const dosha = doshaProfile.primary;
     const doshaData = ayurvedicKnowledge.doshaProfiles[dosha];
-    
+
     switch (intent) {
       case 'food':
         return this.generateFoodResponse(dosha, doshaData, context);
@@ -154,28 +154,28 @@ class CustomAI {
   generateFoodResponse(dosha, doshaData, context) {
     const favorFoods = doshaData.balancingFoods.favor.slice(0, 4);
     const avoidFoods = doshaData.balancingFoods.avoid.slice(0, 3);
-    
+
     let response = `For your ${dosha.toUpperCase()} constitution, I recommend focusing on ${favorFoods.join(', ')}. `;
-    
+
     if (context.timeOfDay === 'morning') {
       response += `Start your day with warm, nourishing foods like oatmeal with ghee and dates. `;
     } else if (context.timeOfDay === 'evening') {
       response += `For dinner, choose lighter, easily digestible options. `;
     }
-    
+
     response += `Avoid ${avoidFoods.join(', ')} as they can aggravate your ${dosha} nature. `;
     response += `These recommendations help balance your ${doshaData.qualities.join(', ').toLowerCase()} qualities.`;
-    
+
     return response;
   }
 
   generateLifestyleResponse(dosha, doshaData, context) {
     const routine = doshaData.lifestyle.routine;
     const environment = doshaData.lifestyle.environment;
-    
+
     let response = `Your ${dosha.toUpperCase()} constitution thrives with ${routine.toLowerCase()}. `;
     response += `Create an environment that is ${environment.toLowerCase()}. `;
-    
+
     if (dosha === 'vata') {
       response += `Stick to regular meal times and sleep schedules. Oil massage before bed can be very grounding.`;
     } else if (dosha === 'pitta') {
@@ -183,21 +183,21 @@ class CustomAI {
     } else if (dosha === 'kapha') {
       response += `Stay active and avoid excessive sleep. Stimulating activities help maintain your energy.`;
     }
-    
+
     return response;
   }
 
   generateExerciseResponse(dosha, doshaData, context) {
     const exerciseType = doshaData.lifestyle.exercise;
     const yogaPractices = ayurvedicKnowledge.yogaPractices[dosha];
-    
+
     let response = `For your ${dosha.toUpperCase()} constitution, ${exerciseType.toLowerCase()} works best. `;
     response += `Try ${yogaPractices.slice(0, 3).join(', ')} for optimal balance. `;
-    
+
     if (context.timeOfDay === 'morning') {
       response += `Morning practice helps set a positive tone for your day. `;
     }
-    
+
     if (dosha === 'vata') {
       response += `Focus on grounding, slow movements rather than intense cardio.`;
     } else if (dosha === 'pitta') {
@@ -205,16 +205,16 @@ class CustomAI {
     } else if (dosha === 'kapha') {
       response += `More vigorous exercise helps stimulate your naturally slower metabolism.`;
     }
-    
+
     return response;
   }
 
   generateHealthResponse(dosha, doshaData, context) {
     let response = `For ${dosha.toUpperCase()} health maintenance, focus on balancing your ${doshaData.element.join(' + ')} elements. `;
-    
+
     if (context.symptoms.length > 0) {
       response += `For your current concerns, `;
-      
+
       if (context.symptoms.includes('digestive')) {
         response += `gentle spices like ginger and cumin can help digestion. `;
       }
@@ -225,32 +225,32 @@ class CustomAI {
         response += `gentle movement and adequate rest are important. `;
       }
     }
-    
+
     response += `Remember, prevention through lifestyle alignment is key in Ayurveda.`;
-    
+
     return response;
   }
 
   generateMentalHealthResponse(dosha, doshaData, context) {
     const mentalPractices = ayurvedicKnowledge.mentalHealth[dosha];
-    
+
     let response = `For ${dosha.toUpperCase()} mental balance, ${mentalPractices.stressManagement} is particularly effective. `;
     response += `Practice ${mentalPractices.meditation} meditation regularly. `;
-    
+
     if (context.urgency) {
       response += `For immediate relief, try deep breathing exercises. `;
     }
-    
+
     response += `Your ${dosha} nature benefits from ${mentalPractices.lifestyle} approaches to mental wellness.`;
-    
+
     return response;
   }
 
   generateSleepResponse(dosha, doshaData, context) {
     const sleepAdvice = doshaData.lifestyle.sleep;
-    
+
     let response = `For quality sleep with your ${dosha.toUpperCase()} constitution, ${sleepAdvice.toLowerCase()}. `;
-    
+
     if (dosha === 'vata') {
       response += `Warm oil massage before bed and consistent sleep times help calm your active mind.`;
     } else if (dosha === 'pitta') {
@@ -258,13 +258,13 @@ class CustomAI {
     } else if (dosha === 'kapha') {
       response += `Avoid daytime naps and heavy evening meals to maintain healthy sleep patterns.`;
     }
-    
+
     return response;
   }
 
   generateDigestionResponse(dosha, doshaData, context) {
     let response = `For ${dosha.toUpperCase()} digestive health, `;
-    
+
     if (dosha === 'vata') {
       response += `eat warm, cooked foods at regular times. Avoid cold drinks and raw foods.`;
     } else if (dosha === 'pitta') {
@@ -272,15 +272,15 @@ class CustomAI {
     } else if (dosha === 'kapha') {
       response += `use warming spices and avoid heavy, oily foods. Light, warm meals support your slower digestion.`;
     }
-    
+
     response += ` Mindful eating and proper food combining are essential for all constitutions.`;
-    
+
     return response;
   }
 
   generateGeneralResponse(dosha, doshaData, context, userMessage) {
     const template = this.responseTemplates.general[Math.floor(Math.random() * this.responseTemplates.general.length)];
-    
+
     return template
       .replace('{dosha}', dosha.toUpperCase())
       .replace('{advice}', `maintaining balance through ${doshaData.lifestyle.routine.toLowerCase()}`)
@@ -305,7 +305,7 @@ class CustomAI {
   generateExplanation(intent, doshaProfile, response) {
     const dosha = doshaProfile.primary;
     const doshaData = ayurvedicKnowledge.doshaProfiles[dosha];
-    
+
     return {
       reasoning: [
         `Response tailored for ${dosha.toUpperCase()}-dominant constitution`,
