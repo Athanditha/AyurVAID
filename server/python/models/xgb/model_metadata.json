@@ -1,0 +1,37 @@
+{
+    "features": [
+        "Body Frame",
+        "Type of Hair",
+        "Color of Hair",
+        "Skin",
+        "Complexion",
+        "Body Weight",
+        "Nails",
+        "Size and Color of the Teeth",
+        "Pace of Performing Work",
+        "Mental Activity",
+        "Memory",
+        "Sleep Pattern",
+        "Weather Conditions",
+        "Reaction under Adverse Situations",
+        "Mood",
+        "Eating Habit",
+        "Hunger",
+        "Body Temperature",
+        "Joints",
+        "Nature",
+        "Body Energy",
+        "Quality of Voice",
+        "Dreams",
+        "Social Relations",
+        "Body Odor"
+    ],
+    "classes": [
+        "Kapha",
+        "Pitta",
+        "Vata"
+    ],
+    "performance": {
+        "accuracy": 0.864
+    }
+}

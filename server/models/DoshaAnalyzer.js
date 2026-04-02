@@ -4,7 +4,7 @@ const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 
 class DoshaAnalyzer {
   constructor() {
-    this.pythonScriptPath = path.join(__dirname, '../python/predict_models.py');
+    this.pythonScriptPath = path.join(__dirname, '../python/xgb_model.py');
     this.doshaDescriptions = ayurvedicKnowledge.doshaProfiles;
   }
 
@@ -40,8 +40,8 @@ class DoshaAnalyzer {
         constitutionType: predictionResponse.constitutionType,
         confidence: predictionResponse.confidence,
         engine: predictionResponse.engine,
-        comparative_rf_scores: predictionResponse.comparative_rf_scores,
         profile: this.generateProfile(predictionResponse.scores, primary, secondary),
+
         recommendations: this.generateRecommendations(primary)
       };
 
