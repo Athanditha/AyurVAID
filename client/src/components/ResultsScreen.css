@@ -1,10 +1,13 @@
 .results-content {
   padding: 4rem 3rem;
   min-height: 100vh;
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   margin: 2rem;
   border-radius: 20px;
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .results-loading {
@@ -57,10 +60,12 @@
   justify-content: space-around;
   margin-bottom: 3rem;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 20px;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .dosha-item {
@@ -119,10 +124,13 @@
 .explanation {
   margin-bottom: 3rem;
   padding: 2rem;
-  background: var(--mint-green);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 20px;
+  border: 1px solid var(--glass-border);
   border-left: 4px solid var(--secondary-green);
-  box-shadow: 0 4px 15px var(--shadow-light);
+  box-shadow: var(--glass-shadow);
 }
 
 .explanation h5 {
@@ -159,10 +167,12 @@
 
 .recommendation-card {
   padding: 2rem;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 20px;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
   transition: transform 0.3s ease;
 }
 
@@ -246,15 +256,15 @@
   }
 }
 
-/* AI Wisdom Card Styles */
 .ai-wisdom-card {
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   padding: 2.5rem;
   border-radius: 20px;
   margin-bottom: 2.5rem;
-  box-shadow: 0 12px 40px var(--shadow-medium);
-  border: 1px solid var(--border-light);
-  background: linear-gradient(135deg, var(--pure-white) 0%, var(--mint-green) 100%);
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
   position: relative;
   overflow: hidden;
 }

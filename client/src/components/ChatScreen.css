@@ -2,7 +2,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--pure-white);
+  background: transparent;
 }
 
 .chat-header {
@@ -60,7 +60,7 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
-  background: var(--warm-white);
+  background: transparent;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -114,10 +114,13 @@
 }
 
 .bot-message .message-content {
-  background: var(--pure-white);
-  border: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   color: var(--text-dark);
   border-bottom-left-radius: 8px;
+  box-shadow: var(--glass-shadow);
 }
 
 .user-message .message-content {
@@ -243,9 +246,12 @@
 .dosha-context-section {
   margin: 1.2rem 0;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 8px;
-  border: 1px solid rgba(74, 124, 89, 0.1);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .research-item {
@@ -408,8 +414,10 @@
 
 .chat-input-container {
   padding: 2rem;
-  background: var(--pure-white);
-  border-top: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border);
   box-shadow: 0 -4px 15px var(--shadow-light);
 }
 

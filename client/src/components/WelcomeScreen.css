@@ -2,10 +2,13 @@
   padding: 4rem 3rem;
   text-align: center;
   min-height: 100vh;
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   margin: 2rem;
   border-radius: 20px;
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .welcome-content h2 {
@@ -37,12 +40,15 @@
   text-align: center;
   padding: 2.5rem 2rem;
   border-radius: 20px;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
-  border: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  box-shadow: var(--glass-shadow);
 }
 
 .feature::before {

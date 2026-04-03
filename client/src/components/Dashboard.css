@@ -3,7 +3,7 @@
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
-  background: var(--warm-white);
+  background: transparent;
 }
 
 .dashboard-loading {
@@ -31,10 +31,12 @@
   align-items: center;
   margin-bottom: 3rem;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 20px;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 4px 15px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .user-welcome h2 {
@@ -80,13 +82,16 @@
 
 .action-card {
   padding: 2rem;
-  background: linear-gradient(135deg, var(--pure-white) 0%, var(--mint-green) 100%);
-  border: 2px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
   font-family: inherit;
+  box-shadow: var(--glass-shadow);
 }
 
 .action-card:hover {
@@ -147,9 +152,12 @@
 .empty-state {
   text-align: center;
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 16px;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .empty-state svg {
@@ -180,12 +188,14 @@
 
 .profile-card {
   padding: 1.5rem;
-  background: var(--pure-white);
-  border: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px var(--shadow-light);
+  box-shadow: var(--glass-shadow);
 }
 
 .profile-card:hover {
@@ -243,12 +253,15 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: var(--pure-white);
-  border: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  box-shadow: var(--glass-shadow);
 }
 
 .conversation-card:hover {

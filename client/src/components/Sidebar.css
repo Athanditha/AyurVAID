@@ -1,7 +1,9 @@
 .sidebar {
   height: 100vh;
-  background: var(--pure-white);
-  border-right: 1px solid var(--border-light);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -235,7 +237,7 @@
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid var(--border-light);
-  background: var(--warm-white);
+  background: transparent;
 }
 
 .user-info {
@@ -244,9 +246,9 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: var(--pure-white);
+  background: var(--glass-bg);
   border-radius: 8px;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--glass-border);
 }
 
 .user-avatar {

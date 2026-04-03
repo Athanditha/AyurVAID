@@ -24,11 +24,18 @@
   --shadow-light: rgba(45, 80, 22, 0.08);
   --shadow-medium: rgba(45, 80, 22, 0.15);
   --shadow-strong: rgba(45, 80, 22, 0.25);
+  
+  /* Liquid Glass Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(45, 80, 22, 0.1);
+  --glass-blur: blur(16px) saturate(180%);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
-  background: var(--warm-white);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f8f9fa 50%, #e0f2f1 100%);
+  background-attachment: fixed;
   min-height: 100vh;
   color: var(--text-dark);
   line-height: 1.6;
@@ -44,7 +51,7 @@ body {
 /* Auth Layout (without sidebar) */
 .app-container.auth-layout {
   flex-direction: column;
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 50%, var(--warm-white) 100%);
+  background: transparent;
 }
 
 .app-container.auth-layout .main-content {
@@ -58,31 +65,33 @@ body {
 .app-container.auth-layout .screen-container {
   width: 100%;
   max-width: 900px;
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-radius: 24px;
-  box-shadow: 0 20px 60px var(--shadow-medium);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--glass-border);
 }
 
 /* Sidebar Layout */
 .app-container.sidebar-layout {
   flex-direction: row;
-  background: var(--warm-white);
+  background: transparent;
 }
 
 .main-content-with-sidebar {
   flex: 1;
   margin-left: 280px;
   min-height: 100vh;
-  background: var(--warm-white);
+  background: transparent;
   transition: margin-left 0.3s ease;
 }
 
 .screen-content {
   width: 100%;
   min-height: 100vh;
-  background: var(--warm-white);
+  background: transparent;
 }
 
 /* Settings Placeholder */
@@ -149,9 +158,11 @@ body {
 }
 
 .btn-secondary {
-  background: var(--warm-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--primary-green);
-  border: 2px solid var(--border-light);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover {

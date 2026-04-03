@@ -1,10 +1,13 @@
 .assessment-content {
   padding: 4rem 3rem;
   min-height: 100vh;
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   margin: 2rem;
   border-radius: 20px;
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .assessment-loading {
@@ -47,12 +50,14 @@
 }
 
 .question-card {
-  background: linear-gradient(135deg, var(--mint-green) 0%, var(--pure-white) 100%);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   padding: 3rem 2.5rem;
   border-radius: 20px;
   margin-bottom: 2.5rem;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 8px 25px var(--shadow-light);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .question-category {
@@ -80,9 +85,11 @@
 
 .option {
   padding: 1.2rem 1.8rem;
-  border: 2px solid var(--border-light);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  background: var(--pure-white);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
@@ -90,6 +97,7 @@
   color: var(--text-dark);
   text-align: left;
   font-family: inherit;
+  box-shadow: var(--glass-shadow);
 }
 
 .option:hover {
