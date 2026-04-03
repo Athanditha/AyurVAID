@@ -4,7 +4,7 @@ const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 
 class DoshaAnalyzer {
   constructor() {
-    this.pythonScriptPath = path.join(__dirname, '../python/xgb_model.py');
+    this.pythonScriptPath = path.join(__dirname, '../python/catboost_model.py');
     this.doshaDescriptions = ayurvedicKnowledge.doshaProfiles;
   }
 

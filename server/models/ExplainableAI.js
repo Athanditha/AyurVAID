@@ -19,18 +19,11 @@ class ExplainableAI {
   }
 
   explainDoshaAnalysis(analysisData, context) {
-    const { scores, primary, engine, comparative_rf_scores, responses } = analysisData;
+    const { scores, primary, engine, responses } = analysisData;
     
-    // Calculate comparative agreement between the two models
-    const rf_primary = Object.keys(comparative_rf_scores).reduce((a, b) => comparative_rf_scores[a] > comparative_rf_scores[b] ? a : b);
-    const modelsAgree = rf_primary === primary;
-
     const reasoning = [
       `Your physical and mental traits were analyzed using an ${engine} Machine Learning classifier trained on a clinical dataset of 5,000 individuals.`,
-      `The model predicts your primary dosha is ${primary.toUpperCase()} with ${scores[primary]}% confidence.`,
-      modelsAgree 
-        ? `This prediction is highly reliable, as an independent Random Forest model also confirmed ${primary.toUpperCase()} as your dominant constitution.`
-        : `An independent Random Forest model provided a slightly variant prediction weighing towards ${rf_primary.toUpperCase()}, suggesting you may have a strong dual-dosha presentation.`
+      `The model predicts your primary dosha is ${primary.toUpperCase()} with ${scores[primary]}% confidence.`
     ];
 
     if (responses) {
@@ -39,15 +32,13 @@ class ExplainableAI {
 
     return {
       type: 'Statistical Machine Learning Analysis',
-      confidence: modelsAgree ? 'Very High' : 'High',
+      confidence: 'High',
       reasoning: reasoning,
       evidenceBased: {
         datasetSize: 5000,
-        primaryEngine: engine,
-        comparativeEngine: 'Random Forest',
-        modelAgreement: modelsAgree
+        primaryEngine: engine
       },
-      methodology: 'Gradient Boosting & Ensemble Classification Models'
+      methodology: 'Gradient Boosting Classification Model'
     };
   }
 
