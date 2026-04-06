@@ -33,17 +33,18 @@ class DoshaAnalyzer {
       const secondary = predictionResponse.secondary;
 
       // 3. Construct unified response format expected by frontend
-      return {
-        scores: predictionResponse.scores, // e.g. { vata: 20, pitta: 70, kapha: 10 }
-        primary: primary,
-        secondary: secondary,
-        constitutionType: predictionResponse.constitutionType,
-        confidence: predictionResponse.confidence,
-        engine: predictionResponse.engine,
-        profile: this.generateProfile(predictionResponse.scores, primary, secondary),
-
-        recommendations: this.generateRecommendations(primary)
-      };
+        return {
+          scores: predictionResponse.scores, // e.g. { vata: 20, pitta: 70, kapha: 10 }
+          primary: primary,
+          secondary: secondary,
+          constitutionType: predictionResponse.constitutionType,
+          confidence: predictionResponse.confidence,
+          engine: predictionResponse.engine,
+          xaiInsights: predictionResponse.xai_insights,
+          profile: this.generateProfile(predictionResponse.scores, primary, secondary),
+  
+          recommendations: this.generateRecommendations(primary)
+        };
 
     } catch (error) {
       console.error('Error in ML DoshaAnalyzer:', error);

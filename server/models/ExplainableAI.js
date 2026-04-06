@@ -19,24 +19,36 @@ class ExplainableAI {
   }
 
   explainDoshaAnalysis(analysisData, context) {
-    const { scores, primary, engine, responses } = analysisData;
+    const { scores, primary, engine, responses, xaiInsights } = analysisData;
     
     const reasoning = [
-      `Your physical and mental traits were analyzed using an ${engine} Machine Learning classifier trained on a clinical dataset of 5,000 individuals.`,
-      `The model predicts your primary dosha is ${primary.toUpperCase()} with ${scores[primary]}% confidence.`
+      `Your physical and mental traits were analyzed using an ${engine} classification model, incorporating SHAP mathematically-derived feature importance for Explainable AI transparency.`,
+      `The model predicts your primary dosha is ${primary.toUpperCase()} with ${scores[primary]}% relative dominance.`
     ];
 
-    if (responses) {
+    if (xaiInsights && xaiInsights.top_contributors && xaiInsights.top_contributors.length > 0) {
+      reasoning.push(`Key Indicators for ${primary.toUpperCase()}: The algorithm heavily weighted your answers regarding ` + 
+        xaiInsights.top_contributors.map(c => `'${c.feature.replace(/_/g, ' ')}' (${c.value})`).join(', ') + ".");
+    }
+    
+    if (xaiInsights && xaiInsights.counter_indicators && xaiInsights.counter_indicators.length > 0) {
+      reasoning.push(`Counter Indicators: Traits like ` + 
+        xaiInsights.counter_indicators.map(c => `'${c.feature.replace(/_/g, ' ')}' (${c.value})`).join(', ') + 
+        ` were recognized but ultimately outweighed by your primary traits.`);
+    }
+
+    if (responses && (!xaiInsights || !xaiInsights.top_contributors)) {
       reasoning.push(`This analysis was based on ${responses.length} exact physiological and behavioral features.`);
     }
 
     return {
-      type: 'Statistical Machine Learning Analysis',
+      type: 'Statistical Machine Learning Analysis with SHAP',
       confidence: 'High',
       reasoning: reasoning,
       evidenceBased: {
         datasetSize: 5000,
-        primaryEngine: engine
+        primaryEngine: engine,
+        interpretability: 'SHapley Additive exPlanations'
       },
       methodology: 'Gradient Boosting Classification Model'
     };

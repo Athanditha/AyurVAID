@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, Home, Utensils, Activity, Brain, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Home, Utensils, Activity, Brain, ArrowLeft, ShieldCheck } from 'lucide-react';
 import './ResultsScreen.css';
 
 const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
@@ -113,16 +113,30 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
               <Brain size={20} className="ai-icon" />
               <h5>Personalized Constitutional Wisdom</h5>
             </div>
-            <p className="ai-wisdom-text">"{aiInsight || explanation.summary}"</p>
+            <p className="ai-wisdom-text">"{aiInsight || explanation?.summary}"</p>
           </div>
 
-          <h5>Analysis Reasoning</h5>
-          <p><strong>Confidence:</strong> {explanation.confidence}</p>
-          <ul>
-            {explanation.reasoning.map((reason, index) => (
-              <li key={index}>• {reason}</li>
-            ))}
-          </ul>
+          <div className="xai-card">
+             <div className="xai-header">
+                 <ShieldCheck size={20} className="xai-icon" />
+                 <h5>Explainable AI (xAI) Reasoning</h5>
+             </div>
+             <p className="xai-confidence"><strong>Model Confidence:</strong> {explanation?.confidence || 'High'}</p>
+             <ul className="xai-list">
+                 {explanation?.reasoning?.map((reason, index) => (
+                 <li key={index}>
+                     <span className="xai-bullet"></span>
+                     {reason}
+                 </li>
+                 )) || <p>No explanation data available.</p>}
+             </ul>
+             {explanation?.evidenceBased && (
+                 <div className="xai-footer">
+                     <span className="xai-tag">{explanation.evidenceBased.interpretability || 'Machine Learning'}</span>
+                     <span className="xai-tag">{explanation.evidenceBased.datasetSize || '5000'} Clinical Profiles</span>
+                 </div>
+             )}
+          </div>
         </motion.div>
 
         <motion.div

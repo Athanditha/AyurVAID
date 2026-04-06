@@ -4,7 +4,7 @@ import os
 import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from catboost import CatBoostClassifier
+from catboost import CatBoostClassifier, Pool
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
@@ -170,15 +170,50 @@ def predict(input_data_json):
         else:
             constitution = "Tri-Dosha (Balanced)"
 
+        # ---------------------------------------------
+        # SHAP Explainable AI (xAI) Integration
+        # ---------------------------------------------
+        # Calculate native shap values for the exact encoded input using CatBoost
+        pool = Pool(df_encoded)
+        shap_values = model.get_feature_importance(type='ShapValues', data=pool)
+        
+        # Shap values shape for CatBoost Multiclass: (n_samples, n_classes, n_features + 1)
+        # We want the explanation for the primary predicted class
+        class_shap_values = shap_values[0, primary_idx, :-1]  # Array of length 25 (excluding base value)
+        
+        # We pair each feature name with its SHAP value and its raw user input value
+        feature_importance = []
+        for i, feature_name in enumerate(expected_features):
+             raw_value = df_input[feature_name].iloc[0]
+             contribution = class_shap_values[i]
+             feature_importance.append({
+                 "feature": feature_name,
+                 "value": str(raw_value),
+                 "contribution": float(contribution)
+             })
+             
+        # Sort by absolute contribution to find the most impactful features
+        feature_importance.sort(key=lambda x: abs(x["contribution"]), reverse=True)
+        
+        # Separate into features that pushed the prediction higher vs lower
+        positive_contributors = [f for f in feature_importance if f["contribution"] > 0][:5]
+        negative_contributors = [f for f in feature_importance if f["contribution"] < 0][:3]
+
+        xai_insights = {
+             "top_contributors": positive_contributors,
+             "counter_indicators": negative_contributors
+        }
+
         # 7. Print the results to standard output so Node.js can read them
         result = {
             "success": True,
-            "engine": "CatBoost", # Marks this engine
+            "engine": "CatBoost (with SHAP xAI)", # Marks this engine
             "scores": scores,
             "primary": primary_dosha,
             "secondary": secondary_dosha,
             "constitutionType": constitution,
-            "confidence": primary_pct
+            "confidence": primary_pct,
+            "xai_insights": xai_insights
         }
         
         print(json.dumps(result))
