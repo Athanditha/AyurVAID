@@ -1,10 +1,16 @@
-.results-content {
-  padding: 4rem 3rem;
-  min-height: 100vh;
+.results-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 350px;
+  gap: 2rem;
+  margin: 2rem;
+}
+
+.results-main {
+  padding: 3rem;
+  min-height: calc(100vh - 4rem);
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  margin: 2rem;
   border-radius: 20px;
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
@@ -17,7 +23,7 @@
   color: var(--text-medium);
 }
 
-.results-content h2 {
+.results-main h2 {
   text-align: center;
   margin-bottom: 3rem;
   color: var(--primary-green);
@@ -81,11 +87,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--pure-white);
   position: relative;
   box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.dosha-initial {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--pure-white);
+  line-height: 1;
+}
+
+.dosha-item.minor {
+  opacity: 0.4;
+  transform: scale(0.9);
+}
+
+.dosha-item.primary {
+  transform: scale(1.1);
+}
+
+.dosha-label {
+  font-size: 0.9rem;
+  color: var(--text-medium);
+  font-weight: 500;
 }
 
 .dosha-vata { 
@@ -119,6 +144,12 @@
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
   font-weight: 700;
+}
+
+.constitution-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  letter-spacing: 0.05em;
 }
 
 .explanation {
@@ -284,12 +315,22 @@
   padding: 1.2rem 3rem;
 }
 
+@media (max-width: 1024px) {
+  .results-wrapper {
+    grid-template-columns: 1fr;
+  }
+  
+  .results-sidepanel {
+    position: static;
+  }
+}
+
 @media (max-width: 768px) {
-  .results-content {
+  .results-main {
     padding: 2.5rem 2rem;
   }
   
-  .results-content h2 {
+  .results-main h2 {
     font-size: 2.2rem;
   }
   
@@ -302,7 +343,10 @@
   .dosha-circle {
     width: 100px;
     height: 100px;
-    font-size: 1.4rem;
+  }
+  
+  .dosha-initial {
+    font-size: 2.8rem;
   }
   
   .recommendations {
@@ -311,13 +355,154 @@
 }
 
 @media (max-width: 480px) {
-  .results-content h2 {
+  .results-main h2 {
     font-size: 1.8rem;
   }
   
   .constitution-type h3 {
     font-size: 1.5rem;
   }
+}
+
+/* Tree Diagram Sidepanel Styles */
+.results-sidepanel {
+  padding: 2.5rem 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  color: var(--primary-green);
+}
+
+.tree-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tree-root {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.tree-root::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: var(--primary-green);
+  opacity: 0.5;
+}
+
+.tree-node-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.tree-branches {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  padding-left: 30px;
+  margin-top: 10px;
+}
+
+.tree-branches::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 20px;
+  left: 29px;
+  width: 2px;
+  background: var(--primary-green);
+  opacity: 0.3;
+}
+
+.tree-branch {
+  position: relative;
+}
+
+.branch-line {
+  position: absolute;
+  top: 20px;
+  left: -30px;
+  width: 20px;
+  height: 2px;
+  background: var(--primary-green);
+  opacity: 0.3;
+}
+
+.tree-node-content {
+  background: rgba(255, 255, 255, 0.4);
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.node-title {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.strengths-title {
+  color: #4A90E2;
+}
+
+.vulnerabilities-title {
+  color: #E8931E;
+}
+
+.node-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.node-list li {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  padding: 0.25rem 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.node-list li::before {
+  content: "•";
+  color: var(--text-medium);
+  font-weight: bold;
 }
 
 .ai-wisdom-card {

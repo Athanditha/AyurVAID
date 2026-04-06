@@ -10,10 +10,10 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
 
   const { scores, primary, secondary, constitutionType, profile, recommendations, explanation, aiInsight } = userProfile;
 
-  const doshaColors = {
-    vata: '#4A90E2',
-    pitta: '#F5A623',
-    kapha: 'var(--secondary-green)'
+  const doshaLabels = {
+    vata: 'Air & Space',
+    pitta: 'Fire & Water',
+    kapha: 'Earth & Water'
   };
 
   const containerVariants = {
@@ -36,76 +36,53 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
     }
   };
 
-  const recommendationCards = [
-    {
-      icon: <Home size={24} />,
-      title: "Lifestyle Recommendations",
-      items: recommendations.lifestyle
-    },
-    {
-      icon: <Utensils size={24} />,
-      title: "Dietary Guidelines",
-      items: [
-        `Favor: ${recommendations.dietary.favor.join(', ')}`,
-        `Avoid: ${recommendations.dietary.avoid.join(', ')}`
-      ]
-    },
-    {
-      icon: <Activity size={24} />,
-      title: "Exercise Recommendations",
-      items: recommendations.exercise
-    },
-    {
-      icon: <Brain size={24} />,
-      title: "Mental Wellness",
-      items: recommendations.mentalWellness
-    }
-  ];
+
 
   return (
-    <div className="results-content">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.div className="results-header" variants={itemVariants}>
-          <button
-            className="back-button"
-            onClick={onBackToDashboard}
-            title="Back to Dashboard"
-          >
-            <ArrowLeft size={20} />
-            Back to Dashboard
-          </button>
-          <h2>Your Dosha Analysis Results</h2>
-        </motion.div>
+    <div className="results-wrapper">
+      <div className="results-main">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="results-header" variants={itemVariants}>
+            <button
+              className="back-button"
+              onClick={onBackToDashboard}
+              title="Back to Dashboard"
+            >
+              <ArrowLeft size={20} />
+              Back to Dashboard
+            </button>
+            <h2>Your Dosha Analysis Results</h2>
+          </motion.div>
 
-        <motion.div className="dosha-chart" variants={itemVariants}>
-          {['vata', 'pitta', 'kapha'].map((dosha) => (
-            <div key={dosha} className="dosha-item">
-              <motion.div
-                className={`dosha-circle dosha-${dosha}`}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
-              >
-                <span>{scores[dosha]}%</span>
-              </motion.div>
-              <div className="dosha-name">
-                {dosha.charAt(0).toUpperCase() + dosha.slice(1)}
+          <motion.div className="dosha-chart" variants={itemVariants}>
+            {['vata', 'pitta', 'kapha'].map((dosha) => (
+              <div key={dosha} className={`dosha-item ${primary === dosha ? 'primary' : secondary === dosha ? 'secondary' : 'minor'}`}>
+                <motion.div
+                  className={`dosha-circle dosha-${dosha}`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
+                >
+                  <span className="dosha-initial">{dosha.charAt(0).toUpperCase()}</span>
+                </motion.div>
+                <div className="dosha-name">
+                  {dosha.charAt(0).toUpperCase() + dosha.slice(1)}
+                </div>
+                <div className="dosha-label">{doshaLabels[dosha]}</div>
               </div>
-            </div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
 
-        <motion.div className="constitution-type" variants={itemVariants}>
-          <h3>Your Constitution: {constitutionType}</h3>
-          <p>
-            Primary: {primary.toUpperCase()} ({scores[primary]}%) |
-            Secondary: {secondary.toUpperCase()} ({scores[secondary]}%)
-          </p>
-        </motion.div>
+          <motion.div className="constitution-type" variants={itemVariants}>
+            <h3>Your Constitution: {constitutionType}</h3>
+            <p className="constitution-subtitle">
+              Primary: {primary.toUpperCase()} | Secondary: {secondary.toUpperCase()}
+            </p>
+          </motion.div>
 
         <motion.div className="explanation" variants={itemVariants}>
           <div className="ai-wisdom-card">
@@ -139,41 +116,64 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
           </div>
         </motion.div>
 
-        <motion.div
-          className="recommendations"
-          variants={containerVariants}
-        >
-          {recommendationCards.map((card, index) => (
-            <motion.div
-              key={index}
-              className="recommendation-card"
-              variants={itemVariants}
-              whileHover={{ y: -4 }}
-            >
-              <div className="card-header">
-                <div className="card-icon">{card.icon}</div>
-                <h4>{card.title}</h4>
-              </div>
-              <ul>
-                {card.items.map((item, itemIndex) => (
-                  <li key={itemIndex}>• {item}</li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </motion.div>
 
-        <motion.button
-          className="btn btn-primary chat-button"
-          onClick={onStartChat}
-          variants={itemVariants}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+
+          <motion.button
+            className="btn btn-primary chat-button"
+            onClick={onStartChat}
+            variants={itemVariants}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <MessageCircle size={20} />
+            Start AI Health Consultation
+          </motion.button>
+        </motion.div>
+      </div>
+      
+      <div className="results-sidepanel">
+        <motion.div 
+          className="tree-diagram-container"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <MessageCircle size={20} />
-          Start AI Health Consultation
-        </motion.button>
-      </motion.div>
+          <div className="tree-header">
+             <Activity size={24} className="tree-icon" />
+             <h3>{primary.toUpperCase()} Characteristics</h3>
+          </div>
+          
+          <div className="tree-root">
+             <div className="tree-node-circle root-circle">{primary.charAt(0).toUpperCase()}</div>
+          </div>
+          
+          <div className="tree-branches">
+            <div className="tree-branch strengths-branch">
+              <div className="branch-line"></div>
+              <div className="tree-node-content">
+                <h4 className="node-title strengths-title">Strengths</h4>
+                <ul className="node-list">
+                  {profile.strengths.slice(0, 4).map((strength, i) => (
+                    <li key={`str-${i}`}>{strength}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <div className="tree-branch vulnerabilities-branch">
+               <div className="branch-line"></div>
+               <div className="tree-node-content">
+                 <h4 className="node-title vulnerabilities-title">Vulnerabilities</h4>
+                 <ul className="node-list">
+                   {profile.vulnerabilities.slice(0, 4).map((vuln, i) => (
+                     <li key={`vuln-${i}`}>{vuln}</li>
+                   ))}
+                 </ul>
+               </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
