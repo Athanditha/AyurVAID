@@ -1,0 +1,30 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - namaste
+    - greetings
+
+- intent: goodbye
+  examples: |
+    - bye
+    - talk to you later
+    - exit
+
+- intent: ask_dosha_diet
+  examples: |
+    - what should I eat for my dosha?
+    - recommend food for pitta
+    - vata diet plan
+    - kapha balancing foods
+    - what are good foods for me?
+
+- intent: ask_dosha_lifestyle
+  examples: |
+    - what lifestyle changes should I make?
+    - how to balance my dosha with a daily routine?
+    - exercise for vata
+    - yoga recommendations

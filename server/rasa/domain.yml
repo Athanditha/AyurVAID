@@ -1,0 +1,26 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - ask_dosha_diet
+  - ask_dosha_lifestyle
+  - identify_dosha
+
+responses:
+  utter_greet:
+    - text: "Namaste! I am your AyurVAID virtual assistant. I can help analyze your Dosha, suggest Ayurvedic diets, and provide lifestyle recommendations."
+  
+  utter_goodbye:
+    - text: "Stay balanced and healthy. Namaste!"
+    
+  utter_default:
+    - text: "I'm still learning the depths of Ayurvedic texts. Could you rephrase your question?"
+
+actions:
+  - action_rag_diet_query
+  - action_rag_lifestyle_query
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

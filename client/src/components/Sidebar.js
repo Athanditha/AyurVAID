@@ -14,7 +14,6 @@ import {
   Cpu
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import AIProviderSettings from './AIProviderSettings';
 import axios from 'axios';
 import './Sidebar.css';
 
@@ -29,7 +28,6 @@ const Sidebar = ({
   const [profiles, setProfiles] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showAISettings, setShowAISettings] = useState(false);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -343,52 +341,29 @@ const Sidebar = ({
             </AnimatePresence>
           </button>
 
-          <button
-            className="footer-btn"
-            onClick={() => setShowAISettings(true)}
-            title={isCollapsed ? "AI Provider" : ""}
-          >
-            <Cpu size={18} />
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  variants={contentVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                >
-                  AI Provider
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
-
-          <button
-            className="footer-btn logout-btn"
-            onClick={logout}
-            title={isCollapsed ? "Logout" : ""}
-          >
-            <LogOut size={18} />
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  variants={contentVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                >
-                  Logout
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
         </div>
       </div>
+      
+      <button
+        className="footer-btn logout-btn"
+        onClick={logout}
+        title={isCollapsed ? "Logout" : ""}
+      >
+        <LogOut size={18} />
+        <AnimatePresence>
+          {!isCollapsed && (
+            <motion.span
+              variants={contentVariants}
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+            >
+              Logout
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </button>
 
-      {/* AI Provider Settings Modal */}
-      {showAISettings && (
-        <AIProviderSettings onClose={() => setShowAISettings(false)} />
-      )}
     </motion.div>
   );
 };

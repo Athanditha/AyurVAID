@@ -3,6 +3,7 @@ const OpenAI = require('openai');
 const LocalAI = require('./LocalAI');
 const HuggingFaceAI = require('./HuggingFaceAI');
 const CustomAI = require('./CustomAI');
+const RasaAI = require('./RasaAI');
 
 class AIServiceManager {
   constructor() {
@@ -10,7 +11,8 @@ class AIServiceManager {
       openai: null,
       local: new LocalAI(),
       huggingface: new HuggingFaceAI(),
-      custom: new CustomAI()
+      custom: new CustomAI(),
+      rasa: new RasaAI()
     };
     
     this.currentProvider = process.env.AI_PROVIDER || 'custom';
@@ -77,6 +79,9 @@ class AIServiceManager {
           response = await provider.generateResponse(messages, options);
           break;
         case 'custom':
+          response = await provider.generateResponse(messages, doshaProfile);
+          break;
+        case 'rasa':
           response = await provider.generateResponse(messages, doshaProfile);
           break;
         default:

@@ -1,0 +1,22 @@
+version: "3.1"
+
+rules:
+- rule: Respond to greet
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Respond to goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Handle diet queries via RAG
+  steps:
+  - intent: ask_dosha_diet
+  - action: action_rag_diet_query
+
+- rule: Handle lifestyle queries via RAG
+  steps:
+  - intent: ask_dosha_lifestyle
+  - action: action_rag_lifestyle_query

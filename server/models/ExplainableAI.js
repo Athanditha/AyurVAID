@@ -57,6 +57,18 @@ class ExplainableAI {
   explainRecommendation(recommendationData, context) {
     const { userProfile } = recommendationData;
     
+    if (!userProfile || !userProfile.primary) {
+      return {
+        type: 'AI Health Recommendation',
+        confidence: 'Medium',
+        reasoning: [
+          `General Ayurvedic advice formulated.`,
+          `For highly tailored advice aligned with your biological traits, please complete a Dosha assessment.`
+        ],
+        methodology: 'Generative alignment with classical text frameworks'
+      };
+    }
+    
     return {
       type: 'AI Health Recommendation',
       confidence: 'High',
