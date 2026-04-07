@@ -2,6 +2,9 @@
 const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 const foodDatabase = require('../data/food-database');
 const researchStudies = require('../data/research-studies');
+const herbs = require('../data/herbs.json');
+const principles = require('../data/principles.json');
+const medicines = require('../data/medicines.json');
 
 class CustomAI {
   constructor() {
