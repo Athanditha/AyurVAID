@@ -91,6 +91,7 @@ class AIServiceManager {
       return {
         ...response,
         provider: this.currentProvider,
+        innerProvider: response.provider || null, // preserve hybrid-rasa-gemini etc.
         timestamp: new Date().toISOString()
       };
 

@@ -76,9 +76,9 @@ class RasaAI {
     }
 
     try {
-      // Accessing Gemini 1.5 Flash natively
+      // Accessing Gemini 2.0 Flash natively (gemini-1.5-flash deprecated)
       const model = this.genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
+        model: "gemini-2.0-flash",
         systemInstruction: systemPrompt
       });
 
@@ -101,7 +101,8 @@ class RasaAI {
 
       return {
         message: result.response.text(),
-        provider: 'hybrid-rasa-gemini' // Tracking origin precisely
+        provider: 'hybrid-rasa-gemini', // Tracking origin precisely
+        model: 'gemini-2.0-flash'
       };
     } catch (llmError) {
       console.error('Hybrid Fallback Gemini Error:', llmError);
