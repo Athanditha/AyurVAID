@@ -46,22 +46,32 @@ class CustomAI {
   async generateResponse(messages, doshaProfile = null) {
     try {
       const userMessage = messages[messages.length - 1].content.toLowerCase();
+    
+      // Detect Dosha in message if not provided in profile
+      let activeDosha = (doshaProfile && typeof doshaProfile === 'object') ? doshaProfile.primary : doshaProfile;
+      
+      if (!activeDosha) {
+        if (userMessage.includes('vata')) activeDosha = 'Vata';
+        else if (userMessage.includes('pitta')) activeDosha = 'Pitta';
+        else if (userMessage.includes('kapha')) activeDosha = 'Kapha';
+      }
+
       const intent = this.classifyIntent(userMessage);
       const context = this.extractContext(userMessage);
 
       let response = '';
-      let explanation = {};
+      let explanation = '';
 
-      if (doshaProfile) {
-        response = this.generatePersonalizedResponse(intent, context, doshaProfile, userMessage);
+      if (activeDosha) {
+        response = this.generatePersonalizedResponse(intent, context, activeDosha, userMessage);
         
         // Add RAG-based context to the personalized response
         const ragResults = KnowledgeBase.search(userMessage, 2);
         if (ragResults.length > 0) {
-          response += "\n\nInsights from our knowledge base:\n" + KnowledgeBase.formatContext(ragResults);
+          response += "\n\n💡 **Expert Insights for " + activeDosha + ":**\n" + KnowledgeBase.formatContext(ragResults);
         }
         
-        explanation = this.generateExplanation(intent, doshaProfile, response);
+        explanation = this.generateExplanation(intent, activeDosha, response);
       } else {
         response = this.generateGenericResponse(intent, context, userMessage);
         

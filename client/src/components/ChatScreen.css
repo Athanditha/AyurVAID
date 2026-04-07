@@ -134,11 +134,36 @@
 }
 
 .explanation {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   padding: 1.5rem;
-  background: var(--mint-green);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   border-left: 4px solid var(--secondary-green);
+}
+
+.explanation-container {
+  margin-top: 1rem;
+}
+
+.explanation-toggle-btn {
+  background: var(--light-green);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.explanation-toggle-btn:hover {
+  background: var(--secondary-green);
+  transform: translateY(-1px);
 }
 
 .explanation h5 {

@@ -50,20 +50,39 @@ class KnowledgeBase {
     const scored = allItems.map(item => {
       let score = 0;
       const itemText = item.text.toLowerCase();
+      const itemName = item.name.toLowerCase();
       
       keywords.forEach(keyword => {
         if (itemText.includes(keyword)) {
-          score += 1;
-          // Bonus for name matches
-          if (item.name.toLowerCase().includes(keyword)) score += 2;
+          score += 2; 
+          if (itemName.includes(keyword)) score += 5; // Direct name match is high signal
+          if (itemName === keyword) score += 10; // Exact match is highest
         }
       });
+
+      // --- DOSHA DISAMBIGUATION ---
+      const queryLower = query.toLowerCase();
+      const doshas = ['vata', 'pitta', 'kapha'];
+      const mentionedDoshas = doshas.filter(d => queryLower.includes(d));
+      
+      if (mentionedDoshas.length > 0) {
+        const itemPacifies = (item.data.pacify || "").toString().toLowerCase();
+        const pacifiesTarget = mentionedDoshas.some(d => itemPacifies.includes(d));
+        
+        if (pacifiesTarget) {
+          score += 10; // Massive boost for herbs that balance the user's mentioned Dosha
+        } else if (mentionedDoshas.some(d => itemText.includes(d))) {
+          score += 3; // Minor boost if the text mentions the Dosha
+        } else {
+          score -= 5; // Penalty for herbs that don't match the specific Dosha query
+        }
+      }
 
       return { ...item, score };
     });
 
     return scored
-      .filter(item => item.score > 0)
+      .filter(item => item.score > 5) // Increased threshold to filter out weak 'digestion' matches
       .sort((a, b) => b.score - a.score)
       .slice(0, topK);
   }

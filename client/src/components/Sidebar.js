@@ -22,7 +22,8 @@ const Sidebar = ({
   onNavigate, 
   onNewConversation, 
   onSelectConversation,
-  activeConversationId 
+  activeConversationId,
+  refreshTrigger
 }) => {
   const [conversations, setConversations] = useState([]);
   const [profiles, setProfiles] = useState([]);
@@ -32,7 +33,7 @@ const Sidebar = ({
 
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [refreshTrigger]);
 
   const loadUserData = async () => {
     setLoading(true);

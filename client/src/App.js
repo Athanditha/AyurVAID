@@ -21,6 +21,7 @@ function AppContent() {
   const [profileId, setProfileId] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [sidebarRefreshTrigger, setSidebarRefreshTrigger] = useState(0);
 
   const { isAuthenticated, loading } = useAuth();
 
@@ -48,6 +49,7 @@ function AppContent() {
   const handleNewConversation = (convId) => {
     setConversationId(convId);
     setCurrentScreen('chat');
+    setSidebarRefreshTrigger(prev => prev + 1); // Refresh sidebar
   };
 
   const handleSelectConversation = (convId) => {
@@ -137,6 +139,7 @@ function AppContent() {
             setIsLoading={setIsLoading}
             onBackToDashboard={() => handleScreenChange('dashboard')}
             setConversationId={setConversationId}
+            onMessageSent={() => setSidebarRefreshTrigger(prev => prev + 1)}
           />
         );
       case 'settings':
@@ -172,6 +175,7 @@ function AppContent() {
         onNewConversation={handleNewConversation}
         onSelectConversation={handleSelectConversation}
         activeConversationId={conversationId}
+        refreshTrigger={sidebarRefreshTrigger}
       />
       
       <main className="main-content-with-sidebar">

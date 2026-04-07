@@ -4,20 +4,23 @@ import { Send, Bot, User, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import './ChatScreen.css';
 
-const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBackToDashboard, setConversationId }) => {
+const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBackToDashboard, setConversationId, onMessageSent }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [conversation, setConversation] = useState(null);
   const [isLoading, setIsLoadingLocal] = useState(false);
+  const [expandedExplanations, setExpandedExplanations] = useState({});
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (delay = 0) => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, delay);
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    scrollToBottom(100);
+  }, [messages, expandedExplanations]);
 
   useEffect(() => {
     if (conversationId) {
@@ -92,6 +95,7 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
         };
 
         setMessages(prev => [...prev, botMessage]);
+        if (onMessageSent) onMessageSent(); // Notify sidebar to refresh
       } else {
         throw new Error('Failed to get response');
       }
@@ -145,13 +149,27 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
                 <p>{message.content}</p>
                 
                 {message.explanation && (
-                  <motion.div 
-                    className="explanation"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    transition={{ delay: 0.3, duration: 0.4 }}
-                  >
-                    <h5>🧠 Explainable AI Analysis</h5>
+                  <div className="explanation-container">
+                    <button 
+                      className="explanation-toggle-btn"
+                      onClick={() => {
+                        const newExpanded = {...expandedExplanations, [message.id]: !expandedExplanations[message.id]};
+                        setExpandedExplanations(newExpanded);
+                      }}
+                    >
+                      {expandedExplanations[message.id] ? "🔼 Hide AI Analysis" : "🔽 View Explainable AI Analysis"}
+                    </button>
+
+                    <AnimatePresence>
+                      {expandedExplanations[message.id] && (
+                        <motion.div 
+                          className="explanation"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <h5>🧠 Evidence-Based Reasoning</h5>
                     
                     {/* Main reasoning */}
                     {message.explanation.reasoning && Array.isArray(message.explanation.reasoning) && (
@@ -308,7 +326,10 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
                         )}
                       </div>
                     )}
-                  </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 )}
                 
                 <div className="message-time">
