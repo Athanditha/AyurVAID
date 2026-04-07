@@ -2,9 +2,10 @@
 const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 const foodDatabase = require('../data/food-database');
 const researchStudies = require('../data/research-studies');
-const herbs = require('../data/herbs.json');
-const principles = require('../data/principles.json');
-const medicines = require('../data/medicines.json');
+const herbsData = require('../data/herbs.json');
+const principlesData = require('../data/principles.json');
+const medicinesData = require('../data/medicines.json');
+const KnowledgeBase = require('./KnowledgeBase');
 
 class CustomAI {
   constructor() {
@@ -53,9 +54,23 @@ class CustomAI {
 
       if (doshaProfile) {
         response = this.generatePersonalizedResponse(intent, context, doshaProfile, userMessage);
+        
+        // Add RAG-based context to the personalized response
+        const ragResults = KnowledgeBase.search(userMessage, 2);
+        if (ragResults.length > 0) {
+          response += "\n\nInsights from our knowledge base:\n" + KnowledgeBase.formatContext(ragResults);
+        }
+        
         explanation = this.generateExplanation(intent, doshaProfile, response);
       } else {
         response = this.generateGenericResponse(intent, context, userMessage);
+        
+        // Add RAG-based context even to generic responses
+        const ragResults = KnowledgeBase.search(userMessage, 2);
+        if (ragResults.length > 0) {
+          response += "\n\nSpecific findings:\n" + KnowledgeBase.formatContext(ragResults);
+        }
+        
         explanation = this.generateGenericExplanation(intent);
       }
 

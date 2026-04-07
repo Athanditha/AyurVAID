@@ -4,6 +4,7 @@ const LocalAI = require('./LocalAI');
 const HuggingFaceAI = require('./HuggingFaceAI');
 const CustomAI = require('./CustomAI');
 const RasaAI = require('./RasaAI');
+const KnowledgeBase = require('./KnowledgeBase');
 
 class AIServiceManager {
   constructor() {
@@ -65,6 +66,26 @@ class AIServiceManager {
       if (!provider) {
         throw new Error(`Provider ${this.currentProvider} not initialized`);
       }
+
+      // --- RAG (Retrieval Augmented Generation) STEP ---
+      const userMessage = messages[messages.length - 1].content;
+      const searchResults = KnowledgeBase.search(userMessage, 3);
+      
+      if (searchResults.length > 0) {
+        const knowledgeContext = KnowledgeBase.formatContext(searchResults);
+        console.log(`🧠 RAG: Found ${searchResults.length} relevant context items.`);
+        
+        // Find existing system message or create new one
+        let systemMsgIndex = messages.findIndex(m => m.role === 'system');
+        const ragInstruction = `\n\nADDITIONAL AYURVEDIC KNOWLEDGE (verified from classical texts):\n${knowledgeContext}\n\nUse this specific knowledge to enhance your response where relevant.`;
+        
+        if (systemMsgIndex !== -1) {
+          messages[systemMsgIndex].content += ragInstruction;
+        } else {
+          messages.unshift({ role: 'system', content: `You are AyurVAID, an expert Ayurvedic AI.` + ragInstruction });
+        }
+      }
+      // --------------------------------------------------
 
       let response;
       
