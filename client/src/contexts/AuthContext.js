@@ -13,7 +13,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('ayurvaid_token'));
+  const [token, setToken] = useState(typeof window !== 'undefined' ? localStorage.getItem('ayurvaid_token') : null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,30 +1,17 @@
-// AI Service Manager - Unified interface for multiple AI providers
-const OpenAI = require('openai');
-const LocalAI = require('./LocalAI');
-const HuggingFaceAI = require('./HuggingFaceAI');
+// AI Service Manager - Unified interface for AI providers
 const CustomAI = require('./CustomAI');
-const RasaAI = require('./RasaAI');
+const GeminiAI = require('./GeminiAI');
 const KnowledgeBase = require('./KnowledgeBase');
 
 class AIServiceManager {
   constructor() {
     this.providers = {
-      openai: null,
-      local: new LocalAI(),
-      huggingface: new HuggingFaceAI(),
       custom: new CustomAI(),
-      rasa: new RasaAI()
+      gemini: new GeminiAI()
     };
     
-    this.currentProvider = process.env.AI_PROVIDER || 'custom';
+    this.currentProvider = process.env.AI_PROVIDER || 'gemini';
     this.fallbackProvider = 'custom';
-    
-    // Initialize OpenAI if API key is available
-    if (process.env.OPENAI_API_KEY) {
-      this.providers.openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
-      });
-    }
     
     this.initializeProvider();
   }
@@ -90,20 +77,11 @@ class AIServiceManager {
       let response;
       
       switch (this.currentProvider) {
-        case 'openai':
-          response = await this.generateOpenAIResponse(messages, options);
-          break;
-        case 'local':
-          response = await provider.generateResponse(messages, options);
-          break;
-        case 'huggingface':
-          response = await provider.generateResponse(messages, options);
-          break;
         case 'custom':
           response = await provider.generateResponse(messages, doshaProfile);
           break;
-        case 'rasa':
-          response = await provider.generateResponse(messages, doshaProfile);
+        case 'gemini':
+          response = await provider.generateResponse(messages, doshaProfile, options);
           break;
         default:
           throw new Error(`Unknown provider: ${this.currentProvider}`);
@@ -112,7 +90,6 @@ class AIServiceManager {
       return {
         ...response,
         provider: this.currentProvider,
-        innerProvider: response.provider || null, // preserve hybrid-rasa-gemini etc.
         timestamp: new Date().toISOString()
       };
 
@@ -142,24 +119,9 @@ class AIServiceManager {
     }
   }
 
-  async generateOpenAIResponse(messages, options = {}) {
-    const completion = await this.providers.openai.chat.completions.create({
-      model: options.model || "gpt-4",
-      messages: messages,
-      max_tokens: options.max_tokens || 600,
-      temperature: options.temperature || 0.7
-    });
-
-    return {
-      message: completion.choices[0].message.content,
-      model: completion.model,
-      usage: completion.usage
-    };
-  }
-
   async switchProvider(providerName) {
     if (!this.providers[providerName]) {
-      throw new Error(`Unknown provider: ${providerName}`);
+      throw new Error(`Unknown provider: ${providerName}. Available: ${Object.keys(this.providers).join(', ')}`);
     }
 
     const isAvailable = await this.checkProviderAvailability(providerName);
@@ -191,35 +153,11 @@ class AIServiceManager {
   }
 
   async getProviderInfo() {
-    const info = {
+    return {
       current: this.currentProvider,
       fallback: this.fallbackProvider,
       available: await this.getAvailableProviders()
     };
-
-    // Add model information for local provider
-    if (this.providers.local && info.available.local) {
-      try {
-        info.localModels = await this.providers.local.listModels();
-      } catch (error) {
-        info.localModels = [];
-      }
-    }
-
-    return info;
-  }
-
-  // Configuration methods
-  setLocalModel(modelName) {
-    if (this.providers.local) {
-      this.providers.local.model = modelName;
-    }
-  }
-
-  setHuggingFaceModel(modelName) {
-    if (this.providers.huggingface) {
-      this.providers.huggingface.model = modelName;
-    }
   }
 
   setTemperature(temperature) {

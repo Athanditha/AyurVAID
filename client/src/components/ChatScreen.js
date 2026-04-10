@@ -1,8 +1,47 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, ArrowLeft } from 'lucide-react';
+import { Send, Bot, User, ArrowLeft, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import './ChatScreen.css';
+
+// Lightweight Markdown → HTML renderer (no external deps needed)
+function renderMarkdown(text) {
+  if (!text) return '';
+  let html = text
+    // Escape HTML entities first
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Code blocks (```...```)
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Bold **text**
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic *text*
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+    // Headers (### → h4, ## → h3, # → h2)
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    // Unordered list items
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    // Numbered list items
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Wrap consecutive <li> in <ul>
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+    // Line breaks
+    .replace(/\n/g, '<br/>');
+  return html;
+}
+
+function formatProviderName(provider) {
+  const names = {
+    'gemini': 'Gemini AI',
+    'custom': 'Rule Engine',
+  };
+  return names[provider] || provider;
+}
 
 const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBackToDashboard, setConversationId, onMessageSent }) => {
   const [messages, setMessages] = useState([]);
@@ -91,6 +130,7 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
           content: response.data.response.message,
           explanation: response.data.response.explanation,
           doshaContext: response.data.response.doshaContext,
+          aiProvider: response.data.response.aiProvider,
           timestamp: new Date()
         };
 
@@ -146,7 +186,18 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
                 {message.type === 'bot' ? <Bot size={20} /> : <User size={20} />}
               </div>
               <div className="message-content">
-                <p>{message.content}</p>
+                {message.type === 'bot' ? (
+                  <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }} />
+                ) : (
+                  <p>{message.content}</p>
+                )}
+                
+                {message.aiProvider && (
+                  <div className="provider-badge">
+                    <Sparkles size={12} />
+                    <span>{formatProviderName(message.aiProvider)}</span>
+                  </div>
+                )}
                 
                 {message.explanation && (
                   <div className="explanation-container">
@@ -332,11 +383,13 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
                   </div>
                 )}
                 
-                <div className="message-time">
-                  {new Date(message.timestamp).toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
+                <div className="message-footer">
+                  <div className="message-time">
+                    {new Date(message.timestamp).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
                 </div>
               </div>
             </motion.div>

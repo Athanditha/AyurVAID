@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyurVAID — System Documentation & AI Module Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--surface:#111827;--surface2:#1a2236;--border:#1e293b;--accent:#6366f1;--accent2:#818cf8;--accent-glow:rgba(99,102,241,.15);--green:#10b981;--amber:#f59e0b;--rose:#f43f5e;--cyan:#06b6d4;--purple:#a855f7;--text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#64748b;--radius:16px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+.noise{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:9999}
+.hero{position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,.2),transparent 70%);top:-200px;right:-100px;border-radius:50%;animation:float 8s ease-in-out infinite}
+.hero::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(16,185,129,.12),transparent 70%);bottom:-100px;left:-50px;border-radius:50%;animation:float 10s ease-in-out infinite reverse}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.hero-content{position:relative;z-index:1;max-width:800px}
+.badge{display:inline-block;padding:6px 16px;background:var(--accent-glow);border:1px solid rgba(99,102,241,.3);border-radius:99px;font-size:.75rem;font-weight:600;color:var(--accent2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
+h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:900;background:linear-gradient(135deg,#e2e8f0,#6366f1,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.15;margin-bottom:16px}
+.subtitle{font-size:1.15rem;color:var(--text-muted);max-width:600px;margin:0 auto;font-weight:300}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+section{padding:80px 0}
+h2{font-size:1.8rem;font-weight:800;margin-bottom:12px;color:#fff}
+h3{font-size:1.25rem;font-weight:700;margin-bottom:8px;color:#fff}
+.section-sub{color:var(--text-muted);margin-bottom:48px;font-size:1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;margin-bottom:24px;transition:border-color .3s,box-shadow .3s}
+.card:hover{border-color:rgba(99,102,241,.4);box-shadow:0 0 30px rgba(99,102,241,.08)}
+.card-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+ul{padding-left:20px;margin-top:8px}
+ul li{margin-bottom:6px;color:var(--text-muted);font-size:.92rem}
+ul li strong{color:var(--text)}
+.flow-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;margin-bottom:40px}
+.flow-title{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.flow-title .num{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+
+/* Module Diagram Styles */
+.diagram{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:32px 24px;margin:24px 0;overflow-x:auto}
+.diagram-title{text-align:center;font-weight:700;font-size:1rem;color:var(--accent2);margin-bottom:24px;text-transform:uppercase;letter-spacing:1px}
+.d-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.d-box{padding:10px 18px;border-radius:10px;font-size:.78rem;font-weight:600;text-align:center;min-width:120px;border:1px solid;line-height:1.4}
+.d-arrow{text-align:center;color:var(--text-dim);font-size:1.2rem;margin:4px 0}
+.d-label{text-align:center;font-size:.7rem;color:var(--text-dim);margin-bottom:8px;font-style:italic}
+.d-box.primary{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.35);color:var(--accent2)}
+.d-box.green{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green)}
+.d-box.amber{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--amber)}
+.d-box.rose{background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.3);color:var(--rose)}
+.d-box.cyan{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.3);color:var(--cyan)}
+.d-box.purple{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.3);color:var(--purple)}
+.d-box.white{background:rgba(226,232,240,.06);border-color:rgba(226,232,240,.15);color:var(--text)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px}
+.tech-pill{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center;font-size:.82rem;font-weight:500;color:var(--text-muted);transition:all .3s}
+.tech-pill:hover{border-color:var(--accent);color:var(--text)}
+.tech-pill span{display:block;font-size:1.3rem;margin-bottom:4px}
+.divider{width:60px;height:3px;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;margin:16px 0 24px}
+footer{text-align:center;padding:48px 24px;border-top:1px solid var(--border);color:var(--text-dim);font-size:.85rem}
+code{font-family:'JetBrains Mono',monospace;background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:.82rem;color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+<div class="hero-content">
+  <div class="badge">🌿 Final Year Project — System Documentation</div>
+  <h1>AyurVAID</h1>
+  <p class="subtitle">Premium AI-Powered Ayurvedic Health Intelligence System — A comprehensive full-stack application that combines Machine Learning, NLP, Retrieval-Augmented Generation, and Explainable AI to deliver personalised Ayurvedic wellness guidance.</p>
+</div>
+</header>
+
+<main class="container">
+
+<!-- ============ SECTION: OVERVIEW ============ -->
+<section>
+<h2>Application Overview</h2>
+<div class="divider"></div>
+<p class="section-sub">AyurVAID is a Next.js + Express full-stack web application that enables users to discover their Ayurvedic body constitution (Dosha), receive ML-classified health insights with SHAP-based explainability, and interact with a hybrid AI chatbot for personalised wellness recommendations.</p>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(99,102,241,.12);color:var(--accent2)">🖥️</div>
+      <div><h3>Frontend — Next.js Client</h3><span class="tag" style="background:rgba(6,182,212,.12);color:var(--cyan)">React / Next.js</span></div>
+    </div>
+    <ul>
+      <li><strong>WelcomeScreen</strong> — Landing page with system introduction</li>
+      <li><strong>LoginScreen / RegisterScreen</strong> — Firebase JWT authentication</li>
+      <li><strong>AssessmentScreen</strong> — 25-question Prakriti assessment form</li>
+      <li><strong>ResultsScreen</strong> — ML results with SHAP xAI visualisation panel</li>
+      <li><strong>ChatScreen</strong> — Real-time AI chatbot with conversation sidebar</li>
+      <li><strong>Dashboard</strong> — Consolidated health profile and history</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">⚙️</div>
+      <div><h3>Backend — Express.js Server</h3><span class="tag" style="background:rgba(16,185,129,.12);color:var(--green)">Node.js / Express</span></div>
+    </div>
+    <ul>
+      <li><strong>Auth Routes</strong> — JWT-based user registration & login via Firebase</li>
+      <li><strong>Dosha Routes</strong> — Assessment endpoint calling CatBoost ML model</li>
+      <li><strong>Chat Routes</strong> — Conversational AI with RAG enrichment</li>
+      <li><strong>Profile Routes</strong> — Dosha profile storage & retrieval</li>
+      <li><strong>Conversation Routes</strong> — Chat history CRUD operations</li>
+      <li><strong>AI Service Manager</strong> — Unified multi-provider orchestration layer</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ============ SECTION: TECH STACK ============ -->
+<section>
+<h2>Technology Stack</h2>
+<div class="divider"></div>
+<div class="tech-grid">
+  <div class="tech-pill"><span>⚛️</span>Next.js / React</div>
+  <div class="tech-pill"><span>🟢</span>Node.js / Express</div>
+  <div class="tech-pill"><span>🐍</span>Python / CatBoost</div>
+  <div class="tech-pill"><span>🔥</span>Firebase Auth & DB</div>
+  <div class="tech-pill"><span>🤖</span>Rasa NLU (DIET)</div>
+  <div class="tech-pill"><span>💎</span>Google Gemini 2.0</div>
+  <div class="tech-pill"><span>📊</span>SHAP (xAI)</div>
+  <div class="tech-pill"><span>🧠</span>RAG Pipeline</div>
+  <div class="tech-pill"><span>🦙</span>Ollama (Local LLM)</div>
+  <div class="tech-pill"><span>🤗</span>HuggingFace</div>
+</div>
+</section>
+
+<!-- ============ SECTION: HOW IT WORKS ============ -->
+<section>
+<h2>How It Works — End-to-End Flow</h2>
+<div class="divider"></div>
+
+<div class="flow-section">
+  <div class="flow-title"><div class="num" style="background:rgba(99,102,241,.15);color:var(--accent2)">1</div><h3>User Authentication</h3></div>
+  <p style="color:var(--text-muted);font-size:.92rem">Users register or log in via Firebase Authentication. The server issues a JWT token that is attached to all subsequent API requests. The <code>middleware/auth.js</code> middleware validates tokens on protected routes.</p>
+</div>
+
+<div class="flow-section">
+  <div class="flow-title"><div class="num" style="background:rgba(16,185,129,.12);color:var(--green)">2</div><h3>Dosha Assessment (ML Classification)</h3></div>
+  <p style="color:var(--text-muted);font-size:.92rem">The user completes 25 physiological and behavioural questions mapped to CSV columns from a 5,000-row Prakriti dataset. The answers are sent to <code>POST /api/dosha/analyze</code>, which calls <code>DoshaAnalyzer.js</code>. This spawns a Python child process running <code>catboost_model.py</code> — a trained CatBoost gradient-boosting classifier. The model returns probability scores per Dosha, SHAP feature attributions, and constitution type. The <code>ExplainableAI</code> engine then enriches the result with human-readable reasoning. Finally, the AI Service Manager generates a "Wisdom Summary" using the active LLM provider.</p>
+</div>
+
+<div class="flow-section">
+  <div class="flow-title"><div class="num" style="background:rgba(245,158,11,.12);color:var(--amber)">3</div><h3>Health Chatbot (Hybrid AI + RAG)</h3></div>
+  <p style="color:var(--text-muted);font-size:.92rem">Users send messages via <code>POST /api/chat/message</code>. The <code>AIServiceManager</code> orchestrates the active provider. Before dispatching to any AI, a <strong>RAG step</strong> searches the <code>KnowledgeBase</code> (450+ herbs, 120+ principles, 80+ medicines from JSON datasets) using weighted keyword scoring with Dosha-specific boosting. Retrieved context is injected into the system prompt. The active AI provider then generates a personalised response. The <code>ExplainableAI</code> engine wraps the response with transparent reasoning and source citations.</p>
+</div>
+
+<div class="flow-section">
+  <div class="flow-title"><div class="num" style="background:rgba(168,85,247,.12);color:var(--purple)">4</div><h3>Provider Fallback Chain</h3></div>
+  <p style="color:var(--text-muted);font-size:.92rem">If the active provider fails, the <code>AIServiceManager</code> automatically falls back to the <code>CustomAI</code> rule-based engine, which is always available. The Rasa hybrid provider also has an internal fallback—if Rasa NLU returns its default response or is offline, it hands off to Gemini 2.0 Flash as a generative fallback.</p>
+</div>
+</section>
+
+<!-- ============ AI COMPONENT 1: CatBoost + SHAP ============ -->
+<section>
+<h2>AI Component Diagrams</h2>
+<div class="divider"></div>
+<p class="section-sub">Detailed module diagram for each AI component in the AyurVAID system.</p>
+
+<!-- COMPONENT 1 -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">🧬</div>
+  <div><h3>Component 1 — CatBoost ML Classifier + SHAP xAI</h3>
+  <span class="tag" style="background:rgba(16,185,129,.1);color:var(--green)">Classification &amp; Explainability</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">A gradient-boosted decision tree model trained on a 5,000-row Prakriti dataset. It classifies users into Vata, Pitta, or Kapha dosha types from 25 encoded features. SHAP (SHapley Additive exPlanations) values are computed natively via CatBoost's <code>get_feature_importance(type='ShapValues')</code> to identify which user traits most influenced the prediction.</p>
+
+<div class="diagram">
+  <div class="diagram-title">CatBoost + SHAP Module Diagram</div>
+  <div class="d-row"><div class="d-box white">Frontend<br>AssessmentScreen.js<br><small>25 Questions</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">POST /api/dosha/analyze<br><small>dosha.js route</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box amber">DoshaAnalyzer.js<br><small>Node.js Orchestrator</small></div></div>
+  <div class="d-arrow">▼ spawns child_process</div>
+  <div class="d-row"><div class="d-box green">catboost_model.py<br><small>Python Inference Script</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box cyan">LabelEncoder<br><small>Feature Encoding</small></div>
+    <div class="d-box cyan">CatBoostClassifier<br><small>predict_proba()</small></div>
+    <div class="d-box purple">SHAP Values<br><small>get_feature_importance()</small></div>
+  </div>
+  <div class="d-arrow">▼ JSON stdout</div>
+  <div class="d-row">
+    <div class="d-box green">Dosha Scores<br><small>V/P/K percentages</small></div>
+    <div class="d-box purple">xAI Insights<br><small>Top & Counter Contributors</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box rose">ExplainableAI.js<br><small>Human-Readable Reasoning</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white">Frontend ResultsScreen.js<br><small>Visualised Results + SHAP Panel</small></div></div>
+</div>
+</div>
+
+<!-- COMPONENT 2: Hybrid Rasa-Gemini -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(244,63,94,.1);color:var(--rose)">🤖</div>
+  <div><h3>Component 2 — Hybrid Rasa NLU + Gemini Generative Fallback</h3>
+  <span class="tag" style="background:rgba(244,63,94,.1);color:var(--rose)">NLP + Generative AI</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">Rasa NLU uses a DIET (Dual Intent and Entity Transformer) classifier with character-level n-gram featurisers for intent classification of Ayurvedic queries. A <code>FallbackClassifier</code> (threshold 0.3) detects ambiguous queries. When Rasa is ambiguous, offline, or returns an empty response, the system seamlessly hands control to Google Gemini 2.0 Flash as a generative LLM fallback with dosha-contextualised system prompts.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Hybrid Rasa–Gemini Module Diagram</div>
+  <div class="d-row"><div class="d-box white">User Chat Message</div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">AIServiceManager.js<br><small>provider = 'rasa'</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box amber">RasaAI.js<br><small>generateResponse()</small></div></div>
+  <div class="d-arrow">▼ HTTP POST</div>
+  <div class="d-row"><div class="d-box cyan">Rasa NLU Server :5005<br><small>DIET Classifier + TED Policy</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-label">Decision Gate</div>
+  <div class="d-row">
+    <div class="d-box green">✅ Confident<br><small>Return Rasa response</small></div>
+    <div class="d-box rose">❌ Ambiguous/Offline<br><small>Fallback triggered</small></div>
+  </div>
+  <div class="d-arrow" style="margin-top:8px">▼ (fallback path)</div>
+  <div class="d-row"><div class="d-box purple">generativeFallback()<br><small>Gemini 2.0 Flash</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box cyan">System Prompt<br><small>Dosha-Aware Context</small></div>
+    <div class="d-box cyan">Chat History<br><small>Multi-Turn Memory</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white">AI Response to User<br><small>provider: hybrid-rasa-gemini</small></div></div>
+</div>
+</div>
+
+<!-- COMPONENT 3: RAG Knowledge Base -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">📚</div>
+  <div><h3>Component 3 — RAG (Retrieval-Augmented Generation) Pipeline</h3>
+  <span class="tag" style="background:rgba(6,182,212,.1);color:var(--cyan)">Knowledge Retrieval</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">Before any AI provider generates a response, the system performs a Retrieval-Augmented Generation step. The <code>KnowledgeBase.js</code> service loads herbs, Ayurvedic principles, and medicines from JSON datasets. A weighted keyword search with Dosha-specific disambiguation scoring retrieves the most relevant entries. These are formatted and injected into the system prompt as verified classical knowledge.</p>
+
+<div class="diagram">
+  <div class="diagram-title">RAG Pipeline Module Diagram</div>
+  <div class="d-row"><div class="d-box white">User Query<br><small>"herbs for vata digestion"</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">AIServiceManager.js<br><small>RAG Step (pre-generation)</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box amber">KnowledgeBase.js<br><small>search(query, topK=3)</small></div></div>
+  <div class="d-arrow">▼ load()</div>
+  <div class="d-row">
+    <div class="d-box green">herbs.json<br><small>450+ entries</small></div>
+    <div class="d-box green">principles.json<br><small>120+ entries</small></div>
+    <div class="d-box green">medicines.json<br><small>80+ entries</small></div>
+  </div>
+  <div class="d-arrow">▼ weighted keyword scoring</div>
+  <div class="d-row">
+    <div class="d-box cyan">Name Match +5</div>
+    <div class="d-box cyan">Exact Match +10</div>
+    <div class="d-box purple">Dosha Boost +10</div>
+    <div class="d-box rose">Mismatch Penalty −5</div>
+  </div>
+  <div class="d-arrow">▼ formatContext()</div>
+  <div class="d-row"><div class="d-box primary">Enriched System Prompt<br><small>ADDITIONAL AYURVEDIC KNOWLEDGE injection</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white">Active AI Provider<br><small>Generates contextually enriched response</small></div></div>
+</div>
+</div>
+
+<!-- COMPONENT 4: CustomAI Rule Engine -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--amber)">⚡</div>
+  <div><h3>Component 4 — CustomAI Rule-Based Engine</h3>
+  <span class="tag" style="background:rgba(245,158,11,.1);color:var(--amber)">Deterministic / Always Available</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">A fully offline, rule-based AI that serves as the system's ultimate fallback. It uses keyword-based intent classification across 7 health categories (food, lifestyle, exercise, health, mental, sleep, digestion), extract contextual signals (urgency, severity, time-of-day, season, symptoms), and generates dosha-personalised responses from the Ayurvedic knowledge base. It also invokes the RAG KnowledgeBase for expert herb/principle data.</p>
+
+<div class="diagram">
+  <div class="diagram-title">CustomAI Rule Engine Module Diagram</div>
+  <div class="d-row"><div class="d-box white">User Message</div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">CustomAI.js<br><small>generateResponse()</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box amber">classifyIntent()<br><small>7 intent categories</small></div>
+    <div class="d-box amber">extractContext()<br><small>urgency, severity, time, symptoms</small></div>
+    <div class="d-box cyan">Dosha Detection<br><small>from profile or message keywords</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box green">generatePersonalizedResponse()<br><small>7 domain-specific generators</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box purple">Food</div><div class="d-box purple">Lifestyle</div><div class="d-box purple">Exercise</div><div class="d-box purple">Sleep</div>
+    <div class="d-box purple">Mental</div><div class="d-box purple">Digestion</div><div class="d-box purple">Health</div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box cyan">KnowledgeBase.search()<br><small>RAG Expert Insights appended</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white">Final Response + Explanation Object</div></div>
+</div>
+</div>
+
+<!-- COMPONENT 5: ExplainableAI -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">🔍</div>
+  <div><h3>Component 5 — Explainable AI (xAI) Engine</h3>
+  <span class="tag" style="background:rgba(168,85,247,.1);color:var(--purple)">Transparency &amp; Trust</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">The <code>ExplainableAI.js</code> module provides interpretable explanations for every AI decision. For dosha analysis, it narrates why the CatBoost model chose a specific classification, referencing SHAP top-contributors and counter-indicators. For chatbot recommendations, it generates methodology, confidence, and source attribution metadata. This ensures every AI output is transparent and auditable.</p>
+
+<div class="diagram">
+  <div class="diagram-title">Explainable AI Engine Module Diagram</div>
+  <div class="d-row">
+    <div class="d-box amber">Dosha Analysis Result<br><small>from CatBoost + SHAP</small></div>
+    <div class="d-box cyan">Chat Recommendation<br><small>from any AI provider</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">ExplainableAI.js<br><small>generateExplanation(type, data)</small></div></div>
+  <div class="d-arrow">▼ type routing</div>
+  <div class="d-row">
+    <div class="d-box green">DOSHA_ANALYSIS<br><small>explainDoshaAnalysis()</small></div>
+    <div class="d-box green">RECOMMENDATION<br><small>explainRecommendation()</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box purple">Explanation Object</div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box white">type: method used</div>
+    <div class="d-box white">confidence: High/Med</div>
+    <div class="d-box white">reasoning: [array]</div>
+    <div class="d-box white">methodology: string</div>
+  </div>
+</div>
+</div>
+
+<!-- COMPONENT 6: AI Service Manager -->
+<div class="card">
+<div class="card-header">
+  <div class="card-icon" style="background:rgba(99,102,241,.12);color:var(--accent2)">🎛️</div>
+  <div><h3>Component 6 — AI Service Manager (Orchestrator)</h3>
+  <span class="tag" style="background:rgba(99,102,241,.12);color:var(--accent2)">Multi-Provider Orchestration</span></div>
+</div>
+<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:16px">The central nervous system of the AI layer. <code>AIServiceManager.js</code> provides a unified interface to 5 AI providers (OpenAI, LocalAI/Ollama, HuggingFace, CustomAI, Rasa). It handles provider initialisation, availability checks, automatic fallback to CustomAI, and embeds the RAG retrieval step before every generation call.</p>
+
+<div class="diagram">
+  <div class="diagram-title">AI Service Manager Orchestration Diagram</div>
+  <div class="d-row"><div class="d-box white">Incoming Chat or Analysis Request</div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box primary">AIServiceManager.js<br><small>generateResponse()</small></div></div>
+  <div class="d-arrow">▼ RAG Pre-Step</div>
+  <div class="d-row"><div class="d-box cyan">KnowledgeBase.search()<br><small>Context Injection</small></div></div>
+  <div class="d-arrow">▼ provider switch</div>
+  <div class="d-row">
+    <div class="d-box green">OpenAI<br><small>GPT-4</small></div>
+    <div class="d-box amber">Rasa<br><small>Hybrid NLU</small></div>
+    <div class="d-box purple">CustomAI<br><small>Rule-Based</small></div>
+    <div class="d-box cyan">LocalAI<br><small>Ollama</small></div>
+    <div class="d-box rose">HuggingFace<br><small>DialoGPT</small></div>
+  </div>
+  <div class="d-arrow">▼ if provider fails</div>
+  <div class="d-row"><div class="d-box rose">Fallback → CustomAI<br><small>Always Available Guarantee</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white">Unified Response Object<br><small>{ message, provider, timestamp }</small></div></div>
+</div>
+</div>
+</section>
+
+<!-- ============ SECTION: DATA FLOW SUMMARY ============ -->
+<section>
+<h2>Complete System Data Flow</h2>
+<div class="divider"></div>
+<div class="diagram" style="padding:40px 24px">
+  <div class="diagram-title">End-to-End Architecture</div>
+  <div class="d-row"><div class="d-box primary" style="min-width:250px">Next.js Frontend<br><small>Assessment · Chat · Dashboard · Results</small></div></div>
+  <div class="d-arrow">▼ REST API (JWT Auth)</div>
+  <div class="d-row"><div class="d-box green" style="min-width:250px">Express.js Backend :3001<br><small>Routes: /auth · /dosha · /chat · /profile · /conversations</small></div></div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box amber">DoshaAnalyzer<br><small>→ Python CatBoost</small></div>
+    <div class="d-box primary">AIServiceManager<br><small>→ 5 AI Providers</small></div>
+    <div class="d-box cyan">KnowledgeBase<br><small>→ RAG Retrieval</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row">
+    <div class="d-box purple">ExplainableAI<br><small>Transparency Layer</small></div>
+    <div class="d-box rose">Firebase<br><small>Auth + Firestore DB</small></div>
+  </div>
+  <div class="d-arrow">▼</div>
+  <div class="d-row"><div class="d-box white" style="min-width:250px">User Receives<br><small>Personalised, Explainable Ayurvedic Guidance</small></div></div>
+</div>
+</section>
+
+<!-- ============ SECTION: KEY FILES ============ -->
+<section>
+<h2>Key File Reference</h2>
+<div class="divider"></div>
+<div class="card" style="overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:.85rem">
+<thead><tr style="border-bottom:1px solid var(--border);text-align:left">
+  <th style="padding:12px;color:var(--text-muted)">File</th>
+  <th style="padding:12px;color:var(--text-muted)">Purpose</th>
+  <th style="padding:12px;color:var(--text-muted)">AI Role</th>
+</tr></thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>catboost_model.py</code></td><td style="padding:10px">CatBoost train/predict + SHAP</td><td style="padding:10px">ML Classification + xAI</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>DoshaAnalyzer.js</code></td><td style="padding:10px">Node↔Python bridge, result assembly</td><td style="padding:10px">ML Orchestrator</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>RasaAI.js</code></td><td style="padding:10px">Rasa NLU client + Gemini fallback</td><td style="padding:10px">Hybrid NLP + Generative</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>CustomAI.js</code></td><td style="padding:10px">Rule-based intent classification</td><td style="padding:10px">Deterministic AI Fallback</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>KnowledgeBase.js</code></td><td style="padding:10px">Keyword search + Dosha-boosted retrieval</td><td style="padding:10px">RAG Retrieval Engine</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>AIServiceManager.js</code></td><td style="padding:10px">Multi-provider orchestration + fallback</td><td style="padding:10px">AI Service Layer</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>ExplainableAI.js</code></td><td style="padding:10px">Explanation generation for all AI outputs</td><td style="padding:10px">xAI Transparency</td></tr>
+<tr style="border-bottom:1px solid var(--border)"><td style="padding:10px"><code>VectorStore.js</code></td><td style="padding:10px">Cosine similarity vector search</td><td style="padding:10px">Semantic Retrieval</td></tr>
+<tr><td style="padding:10px"><code>rasa/config.yml</code></td><td style="padding:10px">DIET classifier + TED policy config</td><td style="padding:10px">NLU Pipeline Config</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</main>
+
+<footer>
+<p>AyurVAID System Documentation — Generated April 2026</p>
+<p style="margin-top:6px;font-size:.78rem">Final Year Project · AI-Powered Ayurvedic Health Intelligence</p>
+</footer>
+</body>
+</html>
