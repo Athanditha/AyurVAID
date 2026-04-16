@@ -102,11 +102,9 @@ def train():
 
     print(f"\n✅ Training Complete. Models and metadata saved to {model_dir}")
 
-def predict(input_data_json):
-    """Predicts a patient's Dosha given JSON input representing their traits."""
+def predict_dict(input_data):
+    """Predicts a patient's Dosha given a dictionary input representing their traits."""
     try:
-        # 1. Parse Input from JSON string to dictionary
-        input_data = json.loads(input_data_json)
         base_dir, csv_path, model_dir = get_paths()
         
         # 2. Load the trained model and artifacts from disk
@@ -205,25 +203,23 @@ def predict(input_data_json):
         }
 
         # 7. Print the results to standard output so Node.js can read them
-        result = {
-            "success": True,
-            "engine": "CatBoost (with SHAP xAI)", # Marks this engine
-            "scores": scores,
-            "primary": primary_dosha,
-            "secondary": secondary_dosha,
-            "constitutionType": constitution,
-            "confidence": primary_pct,
-            "xai_insights": xai_insights
-        }
-        
-        print(json.dumps(result))
+        return result
         
     except Exception as e:
         error_result = {
             "success": False,
             "error": str(e)
         }
-        print(json.dumps(error_result))
+        return error_result
+
+def predict(input_data_json):
+    """Wrapper for command-line usage that takes JSON string and prints JSON output."""
+    try:
+        input_data = json.loads(input_data_json)
+        result = predict_dict(input_data)
+        print(json.dumps(result))
+    except Exception as e:
+        print(json.dumps({"success": False, "error": str(e)}))
 
 if __name__ == "__main__":
     import warnings

@@ -1,0 +1,304 @@
+================================================================================
+                  AyurVAID - KNOWLEDGE BASE DATA SOURCES
+================================================================================
+  Document Created: 15 April 2026
+  Purpose: Records the origin, provenance, and references of all data files
+           used in the AyurVAID Knowledge Base and ML pipeline.
+================================================================================
+
+
+================================================================================
+ 1. HERBS DATABASE
+================================================================================
+ File:         server/data/herbs.json
+ Size:         ~292 KB
+ Total Entries: 704 herbs, formulations, and Ayurvedic substances
+ Format:       JSON Array of herb objects
+ ────────────────────────────────────────────────────────────────────────────────
+
+ PRIMARY SOURCE:
+   Name:        Amidha Ayurveda
+   Website:     https://www.amidhaayurveda.com
+   Description: An Ayurvedic educational website that provides detailed
+                monographs on Ayurvedic herbs, including their Rasa (taste),
+                Guna (quality), Virya (potency), Vipaka (post-digestive
+                effect), Prabhava (special action), dosha interactions
+                (pacifies/aggravates), and clinical uses.
+
+   URL Pattern: Individual herb pages follow one of two URL patterns:
+                - https://www.amidhaayurveda.com/p/{herb-name}.html
+                - https://www.amidhaayurveda.com/2025/10/{herb-name}-ayurvedic-uses-benefits.html
+
+   Coverage:
+     - 37 entries have full absolute URLs (e.g., https://www.amidhaayurveda.com/p/tulsi.html)
+     - 662 entries have relative paths (e.g., /p/ashwagandha.html)
+     - All relative paths are relative to https://www.amidhaayurveda.com
+
+   Sample URLs:
+     - https://www.amidhaayurveda.com/p/tulsi.html
+     - https://www.amidhaayurveda.com/p/amla.html
+     - https://www.amidhaayurveda.com/p/ashwagandha.html
+     - https://www.amidhaayurveda.com/p/giloy.html
+     - https://www.amidhaayurveda.com/p/shatavari.html
+     - https://www.amidhaayurveda.com/p/nagarmotha.html
+     - https://www.amidhaayurveda.com/2025/10/bhringraj-ayurvedic-uses-benefits.html
+     - https://www.amidhaayurveda.com/2025/10/jatamansi-ayurvedic-uses-benefits.html
+     - https://www.amidhaayurveda.com/2025/10/chandana-sandalwood-ayurvedic-uses.html
+
+   Data Fields Sourced:
+     - name:       Herb's common Ayurvedic (Sanskrit/Hindi) name
+     - link:       Direct URL to the source page on amidhaayurveda.com
+     - preview:    Brief description of the herb's uses and properties
+     - pacify:     Doshas pacified by the herb (e.g., ["Kapha", "Vata"])
+     - aggravate:  Doshas aggravated by the herb (e.g., ["Pitta"])
+     - tridosha:   Whether the herb balances all three doshas
+     - rasa:       Taste(s) (Madhura, Amla, Lavana, Katu, Tikta, Kashaya)
+     - guna:       Qualities (Laghu, Guru, Snigdha, Ruksha, Tikshna, etc.)
+     - virya:      Potency (Ushna = Hot, Sheeta = Cold)
+     - vipaka:     Post-digestive taste (Madhura, Amla, Katu)
+     - prabhav:    Special therapeutic actions
+
+
+================================================================================
+ 2. MEDICINES DATABASE
+================================================================================
+ File:         server/data/medicines.json
+ Size:         ~8.5 KB
+ Total Entries: 29 medicinal plant entries
+ Format:       JSON Object with nested "Medicine" key
+ ────────────────────────────────────────────────────────────────────────────────
+
+ PRIMARY SOURCE:
+   Name:        Tamil Siddha Medicine / Ayurvedic Pharmacopoeia Dataset
+   Origin:      Likely exported from a Firebase Realtime Database or similar
+                NoSQL backend. The data uses Tamil vernacular plant names
+                (e.g., "amukkara", "kadukkai", "chukku", "venthayam") 
+                consistent with Tamil Siddha medicine (Siddha Vaidyam)
+                tradition from South India.
+   Website:     No source URL embedded in the data.
+   Description: A structured dataset of 29 medicinal plants used in Tamil
+                traditional medicine, with botanical names, therapeutic uses,
+                dosage recommendations, and plant parts used.
+
+   Medicinal Plants Included (Tamil Name - Botanical Name):
+     - amukkara       - Withania somnifera
+     - athi           - Ficus racemosa
+     - athimathuram   - Glycyrrhiza glabra
+     - attruthummatti - Citrullus colocynthis
+     - avuri          - Indigofera tinctoria
+     - cathikkai      - Myristica fragrans
+     - ceenthil       - Tinospora cordifolia
+     - ceeragam       - Cuminum cyminum
+     - chukku         - Zingiber officinale
+     - cirukurinjan   - Gymnema sylvestre
+     - cirupilai      - Aerva lanata
+     - combu          - Foeniculum vulgare
+     - elavangam      - Syzygium aromaticum
+     - elavangapattai - Cinnamomum verum
+     - ingii          - Zingiber officinale
+     - kadukkai       - Terminalia chebula
+     - kadukurokini   - Picrorhiza kurroa
+     - kakkanam       - Clitoria ternatea
+     - kandankathiri  - Solanum surrattense
+     - karpokkarisi   - Psoralea corylifolia
+     - karuncheeragam - Nigella sativa
+     - kasakasa       - Papaver somniferum
+     - keezhkainelli  - Phyllanthus amarus
+     - kollu          - Vigna unguiculata
+     - kothumalli     - Coriandrum sativum
+     - nerunjil       - Tribulus terrestris
+     - vembu          - Azadirachta indica
+     - venthayam      - Trigonella foenum-graceum
+     - vilvam         - Aegle marmelo
+
+   Data Fields Sourced:
+     - plantname:       Tamil common name
+     - botanicalname:   Latin botanical name
+     - therapeuticuses: Conditions the plant is used for
+     - dosage:          Recommended dosage and form
+     - parts:           Part of the plant used (root, leaf, fruit, etc.)
+     - noofuses:        Number of therapeutic uses
+
+
+================================================================================
+ 3. PRINCIPLES DATABASE
+================================================================================
+ File:         server/data/principles.json
+ Size:         ~149 KB
+ Total Entries: 162 Ayurvedic principles and concepts
+ Format:       JSON Array of principle objects, organised into 8 categories
+ ────────────────────────────────────────────────────────────────────────────────
+
+ CATEGORY BREAKDOWN:
+     - General Concepts:  37 entries
+     - Chikitsa:          35 entries  (Treatment principles)
+     - Roga Nidana:       31 entries  (Pathology & diagnosis)
+     - Dosha:             21 entries  (Dosha theory & sub-doshas)
+     - Dravya Guna:       15 entries  (Pharmacology)
+     - Dhatu:             15 entries  (Tissue theory)
+     - Agni:               6 entries  (Digestive fire)
+     - Mala:               2 entries  (Waste products)
+
+ PRIMARY SOURCES (Classical Sanskrit Texts):
+   The explanations are curated/authored content that synthesizes knowledge
+   from the following classical Ayurvedic and philosophical texts.
+   Each entry contains a "shloka_ref" field citing the original verse.
+
+   ──── Major Ayurvedic Samhitas (Brhat Trayi) ────
+
+   1. Charaka Samhita (चरक संहिता)
+      Author:     Acharya Charaka (redacted from Agnivesha Tantra)
+      Subject:    Internal Medicine (Kayachikitsa)
+      Sections Referenced:
+        - Sutrasthana (General Principles)
+        - Nidanasthana (Pathology)
+        - Vimanasthana (Special Knowledge)
+        - Sharirasthana (Anatomy & Embryology)
+        - Indriyasthana (Prognosis)
+        - Chikitsasthana (Treatment)
+        - Kalpasthana (Pharmacy)
+        - Siddhisthana (Success in Treatment)
+
+   2. Sushruta Samhita (सुश्रुत संहिता)
+      Author:     Acharya Sushruta
+      Subject:    Surgery (Shalya Tantra)
+      Sections Referenced:
+        - Sutrasthana (General Principles)
+        - Nidanasthana (Pathology)
+        - Sharirasthana (Anatomy)
+        - Chikitsasthana (Treatment)
+        - Uttaratantra (Supplementary Topics)
+
+   3. Ashtanga Hrudayam (अष्टांग हृदयम्)
+      Author:     Acharya Vagbhata
+      Subject:    Comprehensive compendium of Ayurveda
+      Sections Referenced:
+        - Sutrasthana (General Principles - extensive use)
+
+   ──── Secondary Classical Texts (Laghu Trayi) ────
+
+   4. Madhava Nidana (माधव निदान)
+      Author:     Acharya Madhavakara
+      Subject:    Diagnosis and Pathology
+      References: Nidana 1/4, 1/11, 22/1
+
+   5. Sharngadhara Samhita (शार्ङ्गधर संहिता)
+      Author:     Acharya Sharngadhara
+      Subject:    Pharmaceutics (Bhaishajya Kalpana)
+      References: Purva Khanda 4/14, Madhyama Khanda 1/1-2
+
+   6. Yogaratnakara (योगरत्नाकर)
+      Author:     Unknown
+      Subject:    Clinical Practice and Formulations
+      References: Rogipariksha 1
+
+   ──── Philosophical Texts ────
+
+   7. Sankhya Karika (सांख्य कारिका)
+      Author:     Ishwara Krishna
+      Subject:    Sankhya Philosophy (foundational to Ayurvedic metaphysics)
+      References: Karika 3, Karika 9
+
+   8. Vaisheshika Sutra (वैशेषिक सूत्र)
+      Author:     Acharya Kanada
+      Subject:    Analytical Philosophy (categories of existence)
+
+   9. Nyaya Sutra (न्याय सूत्र)
+      Author:     Acharya Gautama
+      Subject:    Logic and Epistemology
+
+   ──── Commentaries ────
+
+   10. Chakrapani Datta (Commentary on Charaka Samhita)
+       Name:      Ayurveda Dipika
+       Subject:   Authoritative commentary/interpretation
+
+   11. Dalhana (Commentary on Sushruta Samhita)
+       Name:      Nibandha Sangraha
+       Subject:   Authoritative commentary/interpretation
+
+   Data Fields:
+     - name:                 Sanskrit name with Devanagari script
+     - category:             Classification (Dosha, Dhatu, Chikitsa, etc.)
+     - shloka:               Original Sanskrit verse
+     - shloka_ref:           Citation of the source text, section, and verse
+     - explanation:          Detailed English explanation of the concept
+     - clinical_importance:  Practical clinical relevance
+
+
+================================================================================
+ 4. DOSHA CLASSIFICATION DATASET (CatBoost ML Model)
+================================================================================
+ File:         datasets/ayurvedic_dosha_dataset (1).csv
+ Size:         ~1.2 MB
+ Total Rows:   5,000 data records
+ Format:       CSV with 26 columns (25 features + 1 target label)
+ ────────────────────────────────────────────────────────────────────────────────
+
+ SOURCE:
+   Name:        Kaggle / Ayurvedic Dosha Classification Datasets
+   Website:     https://www.kaggle.com
+   Description: A structured dataset of physical and psychological
+                characteristics mapped to Ayurvedic Dosha types (Vata,
+                Pitta, Kapha). Used to train a CatBoost gradient-boosted
+                classifier for automated Prakriti (constitution) assessment.
+
+ FEATURES (25 input columns):
+   Body Frame, Type of Hair, Color of Hair, Skin, Complexion,
+   Body Weight, Nails, Size and Color of the Teeth,
+   Pace of Performing Work, Mental Activity, Memory, Sleep Pattern,
+   Weather Conditions, Reaction under Adverse Situations, Mood,
+   Eating Habit, Hunger, Body Temperature, Joints, Nature,
+   Body Energy, Quality of Voice, Dreams, Social Relations, Body Odor
+
+ TARGET:
+   Dosha (Vata, Pitta, or Kapha)
+
+
+================================================================================
+ 5. SUPPLEMENTARY DATA FILES
+================================================================================
+ The following JavaScript data files in server/data/ contain additional
+ hardcoded knowledge used by the chatbot and RAG system:
+
+ a) server/data/ayurvedic-knowledge.js  (~10.8 KB)
+    Description: Hardcoded Ayurvedic knowledge rules and mappings
+    Source:      Curated from classical Ayurvedic texts
+
+ b) server/data/food-database.js  (~9.2 KB)
+    Description: Ayurvedic food classification and dietary guidelines
+    Source:      Curated from classical dietary texts (Ahara Vijnana)
+
+ c) server/data/research-studies.js  (~5.7 KB)
+    Description: References to modern research studies on Ayurveda
+    Source:      Academic research papers and clinical studies
+
+ d) server/data/vectors.json  (Empty - 2 bytes)
+    Description: Placeholder for future vector embeddings (RAG pipeline)
+    Source:      N/A
+
+
+================================================================================
+ NOTES ON DATA PROVENANCE
+================================================================================
+
+ 1. The herbs.json data was scraped/collected from amidhaayurveda.com.
+    Each entry retains its original source URL in the "link" field.
+
+ 2. The medicines.json data uses Tamil nomenclature from the Siddha
+    medicine tradition. The nested JSON structure (under a "Medicine" key)
+    suggests it was exported from a Firebase Realtime Database. No original
+    source URL is available for this dataset.
+
+ 3. The principles.json data was authored/curated from classical Sanskrit
+    texts. Each entry cites its original verse reference (shloka_ref),
+    but the English explanations and clinical importance notes are
+    interpreted/written content, not directly quoted from any single
+    web source.
+
+ 4. The dosha classification CSV dataset follows the format commonly
+    found on Kaggle for Ayurvedic constitution datasets.
+
+================================================================================
+                            END OF DOCUMENT
+================================================================================

@@ -4,13 +4,15 @@
   "description": "AyurVAID - Premium Ayurvedic Health Intelligence with AI-powered dosha analysis",
   "main": "server/server.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run python-api\"",
     "server": "nodemon server/server.js",
+    "python-api": "cd server/python && uvicorn api:app --reload --port 8000",
     "client": "cd client && npm run dev",
     "build": "cd client && npm run build",
     "install-client": "cd client && npm install",
     "install-server": "npm install",
-    "install-all": "npm run install-server && npm run install-client",
+    "install-python": "cd server/python && pip install fastapi uvicorn pydantic",
+    "install-all": "npm run install-server && npm run install-client && npm run install-python",
     "start": "node server/server.js"
   },
   "dependencies": {

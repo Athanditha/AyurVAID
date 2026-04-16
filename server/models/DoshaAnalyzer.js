@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const axios = require('axios');
 const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
 
 class DoshaAnalyzer {
@@ -52,45 +53,51 @@ class DoshaAnalyzer {
     }
   }
 
-  runPythonPrediction(inputData) {
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn('python', [
-        this.pythonScriptPath,
-        JSON.stringify(inputData)
-      ]);
+  async runPythonPrediction(inputData) {
+    // Attempt to use FastAPI server first for performance
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/predict', { data: inputData }, { timeout: 5000 });
+      return response.data;
+    } catch (err) {
+      console.warn('FastAPI server unreachable or failed, falling back to spawning python process...', err.message);
+      
+      return new Promise((resolve, reject) => {
+        const pythonProcess = spawn('python', [
+          this.pythonScriptPath,
+          JSON.stringify(inputData)
+        ]);
 
-      let outputData = '';
-      let errorData = '';
+        let outputData = '';
+        let errorData = '';
 
-      pythonProcess.stdout.on('data', (data) => {
-        outputData += data.toString();
-      });
+        pythonProcess.stdout.on('data', (data) => {
+          outputData += data.toString();
+        });
 
-      pythonProcess.stderr.on('data', (data) => {
-        errorData += data.toString();
-      });
+        pythonProcess.stderr.on('data', (data) => {
+          errorData += data.toString();
+        });
 
-      pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-          return reject(new Error(`Python process exited with code ${code}. Error: ${errorData}`));
-        }
-        
-        try {
-          // Parse precisely the JSON response logged by Python
-          // (Python might occasionally log standard warnings, so we extract just the JSON)
-          const jsonMatch = outputData.match(/\{.*\}/);
-          if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            resolve(parsed);
-          } else {
-            console.warn('Raw Python output:', outputData);
-            resolve(JSON.parse(outputData));
+        pythonProcess.on('close', (code) => {
+          if (code !== 0) {
+            return reject(new Error(`Python process exited with code ${code}. Error: ${errorData}`));
           }
-        } catch (e) {
-          reject(new Error(`Failed to parse Python output: ${e.message}\nRaw Data: ${outputData}`));
-        }
+          
+          try {
+            const jsonMatch = outputData.match(/\{.*\}/);
+            if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[0]);
+              resolve(parsed);
+            } else {
+              console.warn('Raw Python output:', outputData);
+              resolve(JSON.parse(outputData));
+            }
+          } catch (e) {
+            reject(new Error(`Failed to parse Python output: ${e.message}\nRaw Data: ${outputData}`));
+          }
+        });
       });
-    });
+    }
   }
 
   generateProfile(percentages, primary, secondary) {

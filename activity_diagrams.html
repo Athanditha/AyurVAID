@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurVAID — AI Module Activity Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e17;
+            color: #e0e4ec;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.06) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #10b981);
+            border-radius: 4px;
+        }
+        .page-header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+        .page-header p {
+            margin-top: 0.75rem;
+            color: #8892a8;
+            font-size: 1.05rem;
+            font-weight: 300;
+        }
+
+        .toc {
+            max-width: 720px;
+            margin: 2.5rem auto 3rem;
+            padding: 2rem 2.5rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+        }
+        .toc h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #818cf8;
+            margin-bottom: 1rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .toc ol { list-style: none; counter-reset: toc; padding: 0; }
+        .toc ol li { counter-increment: toc; margin-bottom: 0.55rem; }
+        .toc ol li a {
+            color: #c7d2e8;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.97rem;
+            transition: color 0.2s, padding-left 0.2s;
+            display: inline-block;
+        }
+        .toc ol li a::before {
+            content: counter(toc) ". ";
+            color: #6366f1;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+        .toc ol li a:hover { color: #a5b4fc; padding-left: 6px; }
+
+        .diagram-section {
+            max-width: 1100px;
+            margin: 0 auto 3.5rem;
+            padding: 0 1.5rem;
+        }
+        .section-card {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+        .section-card:hover { border-color: rgba(99,102,241,0.25); }
+        .section-header { padding: 2rem 2.5rem 1.2rem; }
+        .section-header .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+        .badge-ml   { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.25); }
+        .badge-ai   { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+        .badge-data { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+        .section-header h2 { font-size: 1.55rem; font-weight: 700; color: #f0f2f8; margin-bottom: 0.5rem; }
+        .section-header p { color: #8892a8; font-size: 0.92rem; line-height: 1.6; max-width: 700px; }
+
+        .diagram-container { padding: 1.5rem 2rem 2rem; overflow-x: auto; }
+        .diagram-container .mermaid { display: flex; justify-content: center; }
+        .diagram-container .mermaid svg { max-width: 100%; height: auto !important; }
+
+        .section-notes {
+            margin: 0 2rem 2rem;
+            padding: 1.2rem 1.5rem;
+            background: rgba(99,102,241,0.06);
+            border-left: 3px solid #6366f1;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.88rem;
+            color: #a5b4fc;
+        }
+        .section-notes strong { color: #c7d2ff; }
+
+        .page-footer {
+            text-align: center;
+            padding: 3rem 1rem 2.5rem;
+            color: #4b5570;
+            font-size: 0.82rem;
+        }
+        .page-footer span { color: #6366f1; }
+
+        .legend {
+            max-width: 720px;
+            margin: 0 auto 2.5rem;
+            padding: 1.4rem 2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            display: flex;
+            gap: 2.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.88rem;
+            color: #c7d2e8;
+        }
+        .legend-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .swatch-user { background: rgba(59,130,246,0.35); border-color: #60a5fa; }
+        .swatch-system { background: rgba(16,185,129,0.30); border-color: #34d399; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.8rem; }
+            .section-header { padding: 1.5rem 1.5rem 1rem; }
+            .diagram-container { padding: 1rem; }
+            .section-notes { margin: 0 1rem 1.5rem; }
+            .legend { gap: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="page-header">
+    <h1>AyurVAID — AI Module Activity Diagrams</h1>
+    <p>Activity flow diagrams for every AI and Machine Learning component, split by User and System actions</p>
+</header>
+
+<nav class="toc">
+    <h2>AI Modules</h2>
+    <ol>
+        <li><a href="#catboost">CatBoost Dosha Prediction and SHAP Explanation</a></li>
+        <li><a href="#aimanager">AI Service Manager - Orchestrator</a></li>
+        <li><a href="#gemini">Gemini LLM Provider</a></li>
+        <li><a href="#customai">Rule-Based AI Provider</a></li>
+        <li><a href="#rag">RAG Knowledge Retrieval</a></li>
+        <li><a href="#knowledgebase">Knowledge Base Search</a></li>
+    </ol>
+</nav>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-swatch swatch-user"></div>
+        <span>User Actions (Blue border)</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-swatch swatch-system"></div>
+        <span>System Actions (Green border)</span>
+    </div>
+</div>
+
+
+<!-- 1. CATBOOST -->
+<section class="diagram-section" id="catboost">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ml">Machine Learning</span>
+            <h2>1. CatBoost Dosha Prediction and SHAP Explanation</h2>
+            <p>When a user completes the health questionnaire, the Node.js backend spawns a Python child process that loads a pre-trained CatBoost gradient-boosted classifier. The model runs multi-class inference across 25 encoded features, then uses CatBoost's native SHAP (Shapley Additive exPlanations) to compute per-feature contribution scores for explainability.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart ["User"]
+        A["Complete all 25 health trait questions via React frontend"]
+        B["Submit JSON payload via POST /api/dosha/analyze"]
+        A --> B
+    end
+
+    B --> C
+
+    subgraph System1 ["System"]
+        C["Node.js DoshaAnalyzer receives JSON and spawns Python child process via child_process.execFile"]
+        D["Python script loads CatBoostClassifier, LabelEncoders, and metadata from disk using joblib.load"]
+        E["Parse input JSON into a pandas DataFrame with 25 feature columns"]
+        F["Apply fitted sklearn LabelEncoders to transform each categorical string value into its integer encoding"]
+        G{"Any expected features missing from input?"}
+        H["Fill missing features with 'Unknown', which encodes to le.classes_ index 0 as fallback"]
+        I["Reorder DataFrame columns to match the exact training feature order from model_metadata.json"]
+        J["Call model.predict_proba to get softmax probability distribution across 3 classes: Vata, Pitta, Kapha"]
+        K["Select argmax of probability array as Primary dosha"]
+        LL["Select second-highest via argsort as Secondary dosha"]
+        M{"Primary probability >= 60%?"}
+        N["Classify as Single Dosha constitution"]
+        O{"Primary >= 40% AND Secondary >= 30%?"}
+        P["Classify as Dual Dosha constitution"]
+        Q["Classify as Tri-Dosha Balanced constitution"]
+        R["Create CatBoost Pool object and call model.get_feature_importance with type=ShapValues"]
+        S["Extract SHAP values matrix of shape: 1 sample x 3 classes x 26 features+bias, slice primary class"]
+        T["Sort 25 feature contributions by absolute value, select top 5 positive and top 3 negative contributors"]
+        U["Build JSON result: scores, primary, secondary, constitutionType, confidence, xai_insights"]
+        V["Print JSON to stdout, Node.js captures and parses it via child process pipe"]
+
+        C --> D --> E --> F --> G
+        G -->|Yes| H --> I
+        G -->|No| I
+        I --> J --> K --> LL --> M
+        M -->|Yes| N --> R
+        M -->|No| O
+        O -->|Yes| P --> R
+        O -->|No| Q --> R
+        R --> S --> T --> U --> V
+    end
+
+    V --> W
+
+    subgraph UserEnd ["User"]
+        W["View dosha results with SHAP-powered xAI feature attribution tree"]
+    end
+
+    W --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key files:</strong> <code>catboost_model.py</code> (Python ML pipeline), <code>DoshaAnalyzer.js</code> (Node.js orchestrator)<br>
+            <strong>Model config:</strong> CatBoostClassifier with iterations=100, learning_rate=0.1, depth=5, loss_function=MultiClass, random_seed=42.<br>
+            <strong>SHAP:</strong> Uses CatBoost's native Shapley value computation (not the separate shap library), which is exact and efficient for tree-based models. Feature contributions are signed values indicating direction and magnitude of influence on the predicted class.
+        </div>
+    </div>
+</section>
+
+
+<!-- 2. AI SERVICE MANAGER -->
+<section class="diagram-section" id="aimanager">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Orchestration</span>
+            <h2>2. AI Service Manager - Orchestrator</h2>
+            <p>A Strategy-pattern orchestrator that manages multiple AI provider instances. It performs RAG (Retrieval-Augmented Generation) by injecting Knowledge Base search results into the system prompt, delegates to the active provider, and implements automatic failover with provider metadata tagging on every response.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart ["User"]
+        A["Type a health question in the chatbot UI"]
+        B["Send message via POST /api/chat"]
+        A --> B
+    end
+
+    B --> C
+
+    subgraph System2 ["System"]
+        C["AIServiceManager.generateResponse receives messages array and doshaProfile"]
+        D["Extract last user message, call KnowledgeBase.search with query and topK=3"]
+        E{"searchResults.length > 0?"}
+        F["Inject RAG context into system message: append formatted herbs, principles, medicines to prompt"]
+        G["Continue with unaugmented messages array"]
+        H["Resolve active provider from this.currentProvider set via AI_PROVIDER env variable"]
+        I{"this.currentProvider value?"}
+        J["Call GeminiAI.generateResponse with messages, doshaProfile, and options"]
+        K["Call CustomAI.generateResponse with messages and doshaProfile"]
+        LL{"Provider returned successfully without throwing?"}
+        M["Spread response object with provider name and ISO 8601 timestamp"]
+        N["Return enriched response to Express route handler"]
+        O{"this.currentProvider !== this.fallbackProvider?"}
+        P["Swap this.currentProvider to fallbackProvider and recursively call generateResponse"]
+        Q{"Fallback succeeded?"}
+        R["Return response with fallbackUsed=true and originalProvider field"]
+        S["Restore original provider, throw error to Express error handler"]
+
+        C --> D --> E
+        E -->|Yes| F --> H
+        E -->|No| G --> H
+        H --> I
+        I -->|gemini| J --> LL
+        I -->|custom| K --> LL
+        LL -->|Yes| M --> N
+        LL -->|No| O
+        O -->|Yes| P --> Q
+        Q -->|Yes| R
+        Q -->|No| S
+        O -->|No| S
+    end
+
+    N --> T
+    R --> T
+    S --> T
+
+    subgraph UserEnd2 ["User"]
+        T["Receive the AI response with provider badge in the chat UI"]
+    end
+
+    T --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>AIServiceManager.js</code> (Strategy pattern orchestrator)<br>
+            <strong>Provider registry:</strong> <code>{ custom: new CustomAI(), gemini: new GeminiAI() }</code> — instantiated at startup.<br>
+            <strong>RAG injection:</strong> Knowledge context is appended to the <code>system</code> role message with the prefix <em>"ADDITIONAL AYURVEDIC KNOWLEDGE (verified from classical texts)"</em> before being passed to the active provider.<br>
+            <strong>Failover:</strong> If the primary provider throws, the manager swaps to <code>this.fallbackProvider</code> ('custom') and retries the full pipeline. The CustomAI engine is always available as it requires no external API.
+        </div>
+    </div>
+</section>
+
+
+<!-- 3. GEMINI LLM PROVIDER -->
+<section class="diagram-section" id="gemini">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Provider</span>
+            <h2>3. Gemini LLM Provider</h2>
+            <p>Interfaces with the Google Generative AI SDK (<code>@google/generative-ai</code>) to call the Gemini 2.0 Flash model. Constructs a multi-turn chat session with a domain-specific system instruction, injects the user's dosha constitution and any RAG context, sanitises conversation history to comply with Gemini's strict user/model alternation requirement, and implements exponential backoff retry for HTTP 429/503 rate limits.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart3 ["User"]
+        A["Ask a health question in the chatbot"]
+    end
+
+    A --> B
+
+    subgraph System3 ["System"]
+        B{"this.genAI instance exists? Checks GEMINI_API_KEY env var"}
+        C["Throw Error: Gemini AI is not initialised"]
+        D["Call _buildSystemPrompt to construct Ayurvedic advisor system instruction with 7 core directives"]
+        E{"doshaProfile object provided?"}
+        F["Append USER CONSTITUTION block: primary dosha, secondary, percentage scores, constitutionType"]
+        G["Use base system instruction only"]
+        H{"messages array contains a role=system entry from RAG?"}
+        I["Concatenate RAG knowledge context into the systemInstruction string"]
+        J["Use systemInstruction as-is"]
+        K["Initialise model via genAI.getGenerativeModel: model=gemini-2.0-flash, temperature=0.7, maxOutputTokens=800, topP=0.9, topK=40"]
+        LL["Map OpenAI-style messages to Gemini format: role assistant becomes model, wrap content in parts array"]
+        M["Call _sanitiseHistory: merge consecutive same-role messages, strip leading non-user messages"]
+        N["Create chat session via model.startChat with sanitised history, call chat.sendMessage"]
+        O{"result.response.text returned?"}
+        P["Return object: message, provider=gemini, model name, approx token usage"]
+        Q{"attempt < MAX_RETRIES of 3?"}
+        R["Exponential backoff: await Math.pow of 2 to the power attempt+1 times 1000ms, giving 2s, 4s, 8s delays"]
+        S["Throw lastError to trigger AIServiceManager failover"]
+
+        B -->|No| C
+        B -->|Yes| D --> E
+        E -->|Yes| F --> H
+        E -->|No| G --> H
+        H -->|Yes| I --> K
+        H -->|No| J --> K
+        K --> LL --> M --> N --> O
+        O -->|Yes| P
+        O -->|429 or 503 or RESOURCE_EXHAUSTED| Q
+        Q -->|Yes| R --> N
+        Q -->|No| S
+        O -->|Other error| S
+    end
+
+    P --> T
+    C --> T
+    S --> T
+
+    subgraph UserEnd3 ["User"]
+        T["See the personalised Ayurvedic response rendered as Markdown in the chat UI"]
+    end
+
+    T --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>GeminiAI.js</code> (wraps <code>@google/generative-ai</code> SDK)<br>
+            <strong>Model:</strong> <code>gemini-2.0-flash</code> with generationConfig: temperature=0.7, maxOutputTokens=800, topP=0.9, topK=40.<br>
+            <strong>Safety settings:</strong> All 4 harm categories set to <code>BLOCK_ONLY_HIGH</code> to allow health/medical discussions.<br>
+            <strong>History sanitisation:</strong> Gemini's chat API requires strict user/model alternation — the <code>_sanitiseHistory</code> method merges consecutive same-role messages and strips leading model entries.<br>
+            <strong>Retry:</strong> Exponential backoff at 2<sup>n+1</sup> seconds (2s → 4s → 8s) for rate-limit errors (HTTP 429, 503, RESOURCE_EXHAUSTED).
+        </div>
+    </div>
+</section>
+
+
+<!-- 4. RULE-BASED AI PROVIDER -->
+<section class="diagram-section" id="customai">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Provider</span>
+            <h2>4. Rule-Based AI Provider</h2>
+            <p>A deterministic, zero-dependency AI engine that runs entirely on the Node.js server with no external API calls. Uses a keyword-frequency intent classifier to detect 7 topic categories, resolves dosha context from the user profile or message text via string matching, selects from parameterised response templates populated from local data modules (ayurvedic-knowledge.js, food-database.js, research-studies.js), and augments output with a secondary KnowledgeBase.search call for RAG-style enrichment.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart4 ["User"]
+        A["Ask a health question in the chatbot"]
+    end
+
+    A --> B
+
+    subgraph System4 ["System"]
+
+        B["Extract last message and convert to lowercase"]
+        B --> C
+
+        %% ── Phase 1: Dosha Resolution ──
+        C{"doshaProfile provided?"}
+        C -->|"Yes"| D["activeDosha = doshaProfile.primary"]
+        C -->|"No"| E{"Message mentions vata, pitta, or kapha?"}
+        E -->|"Yes"| F["activeDosha = detected dosha keyword"]
+        E -->|"No"| G["activeDosha = null"]
+
+        D --> H
+        F --> H
+        G --> H
+
+        %% ── Phase 2: Intent Classification ──
+        H["classifyIntent: count keyword hits across 7 categories"]
+        H --> I["Pick highest-scoring intent"]
+        I --> J["extractContext: urgency, time-of-day, season, symptoms"]
+        J --> K{"activeDosha set?"}
+
+        %% ── Phase 3: Dosha-Specific Response Generation ──
+        K -->|"Yes"| TP{"Route by intent"}
+        TP -->|"food"| L1["Food: balancingFoods + time modifiers"]
+        TP -->|"exercise"| L2["Exercise: lifestyle.exercise + yoga"]
+        TP -->|"sleep"| L3["Sleep: lifestyle.sleep + tips"]
+        TP -->|"mental"| L4["Mental: stress, meditation, lifestyle"]
+        TP -->|"digestion"| L5["Digestion: Agni dietary-fire advice"]
+        TP -->|"lifestyle"| L6["Lifestyle: routine + environment"]
+        TP -->|"general"| L7["General: random response template"]
+
+        L1 --> N
+        L2 --> N
+        L3 --> N
+        L4 --> N
+        L5 --> N
+        L6 --> N
+        L7 --> N
+
+        %% ── Phase 3b: Generic Response (no dosha) ──
+        K -->|"No"| M["Return static genericAdvice from intent lookup"]
+        M --> N
+
+        %% ── Phase 4: RAG Enrichment ──
+        N["KnowledgeBase.search: userMessage, topK=2"]
+        N --> O{"RAG results found?"}
+        O -->|"Yes"| P["Append Expert Insights via formatContext"]
+        O -->|"No"| Q["Skip RAG enrichment"]
+        P --> R
+        Q --> R
+        R["Return: message, explanation, model=CustomAI-v1.0"]
+    end
+
+    R --> S
+
+    subgraph UserEnd4 ["User"]
+        S["Read Ayurvedic advice with optional Expert Insights in chat"]
+    end
+
+    S --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>CustomAI.js</code> (390 lines, deterministic engine)<br>
+            <strong>Data modules:</strong> <code>ayurvedic-knowledge.js</code> (dosha profiles, yoga practices, mental health mappings), <code>food-database.js</code> (balancing foods), <code>research-studies.js</code> (evidence references).<br>
+            <strong>Intent classification:</strong> Keyword-frequency scoring across 7 categories (food, lifestyle, exercise, health, mental, sleep, digestion) — the category with the most keyword hits wins.<br>
+            <strong>Availability:</strong> <code>isAvailable()</code> always returns <code>true</code> — this engine is the guaranteed fallback since it has zero external dependencies.
+        </div>
+    </div>
+</section>
+
+
+<!-- 5. RAG KNOWLEDGE RETRIEVAL -->
+<section class="diagram-section" id="rag">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-data">Data Pipeline</span>
+            <h2>5. RAG Knowledge Retrieval</h2>
+            <p>Implements a Retrieval-Augmented Generation pipeline within the AIServiceManager. Before dispatching to any AI provider, the system performs a weighted keyword search across 3 local JSON data stores (704 herbs, 162 principles, 29 medicines), applies dosha-specific relevance boosting, and injects the top-K results into the LLM's system prompt so generated responses are grounded in verified Ayurvedic texts rather than relying solely on the model's parametric knowledge.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart5 ["User"]
+        A["Send a question such as: What herbs help Pitta digestion?"]
+    end
+
+    A --> B
+
+    subgraph System5 ["System"]
+        B["AIServiceManager extracts userMessage from messages array at index length-1"]
+        C["Call KnowledgeBase.search with query string and topK=3"]
+        D{"this.isLoaded flag true? Singleton lazy-load check"}
+        E["fs.readFileSync and JSON.parse: herbs.json at 292KB, principles.json at 149KB, medicines.json at 8.5KB"]
+        F["All 895 items loaded into memory arrays: this.herbs, this.principles, this.medicines"]
+        G["Split query into keywords via regex split on whitespace, filter words with length > 2"]
+        H["Build unified search pool: map each herb, principle, and medicine into normalised objects with type, name, text, data fields"]
+        I{"Query string contains 'vata', 'pitta', or 'kapha'?"}
+        J["Apply dosha disambiguation scoring: +10 if item.data.pacify contains the dosha, +3 if text mentions it, -5 penalty if unrelated"]
+        K["Skip dosha boosting, use base keyword scores"]
+        LL["Filter results: keep only items with score > 5 threshold"]
+        M["Sort by score descending, slice to topK=3 results"]
+        N{"Results array is non-empty?"}
+        O["KnowledgeBase.formatContext: build structured string with herb Rasa, Virya, Vipaka, Pacify data and principle explanations"]
+        P["Inject into system message: prepend 'ADDITIONAL AYURVEDIC KNOWLEDGE' block to RAG instruction string"]
+        Q["Provider generates response with RAG-augmented context in system prompt"]
+        R["Provider generates response using only its base system instruction and training data"]
+
+        B --> C --> D
+        D -->|No| E --> F
+        D -->|Yes| F
+        F --> G --> H --> I
+        I -->|Yes| J --> LL
+        I -->|No| K --> LL
+        LL --> M --> N
+        N -->|Yes| O --> P --> Q
+        N -->|No| R
+    end
+
+    Q --> S
+    R --> S
+
+    subgraph UserEnd5 ["User"]
+        S["Receive an answer backed by specific Ayurvedic herbs, principles, and classical references"]
+    end
+
+    S --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key files:</strong> <code>KnowledgeBase.js</code> (singleton search engine), <code>AIServiceManager.js</code> (RAG orchestration at lines 57-74)<br>
+            <strong>RAG</strong> = Retrieval-Augmented Generation — a technique where relevant documents are retrieved from a knowledge store and injected into the LLM prompt, grounding the output in verified facts rather than relying on parametric memory alone.<br>
+            <strong>Data scale:</strong> 704 herbs from amidhaayurveda.com, 162 principles from classical Samhitas (Charaka, Sushruta, Ashtanga Hrudayam), 29 Tamil Siddha medicines — totalling ~450KB of structured JSON.
+        </div>
+    </div>
+</section>
+
+
+<!-- 6. KNOWLEDGE BASE SEARCH -->
+<section class="diagram-section" id="knowledgebase">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-data">Data Layer</span>
+            <h2>6. Knowledge Base Search</h2>
+            <p>A singleton weighted keyword search engine exported as a shared module instance. Implements a TF-IDF-inspired scoring algorithm with tiered weighting (text match, name match, exact match) plus a dosha-specific disambiguation layer that checks each item's <code>pacify</code> field to boost or penalise relevance. All 895 items from 3 JSON stores are loaded lazily on first access and cached in memory for subsequent queries.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+flowchart TD
+    START(["Start"]) --> A
+
+    subgraph UserStart6 ["User"]
+        A["Triggered automatically by AIServiceManager or CustomAI before response generation"]
+    end
+
+    A --> B
+
+    subgraph System6 ["System"]
+        B{"this.isLoaded === true? Singleton lazy-load guard"}
+        C["fs.readFileSync + JSON.parse: herbs.json into this.herbs array of 704 items"]
+        D["JSON.parse: principles.json into this.principles array of 162 items"]
+        E["JSON.parse medicines.json, extract Medicine object, map to flat array with preview fields"]
+        F["Set this.isLoaded = true, log item counts to console"]
+        G["Split query via regex /whitespace+/, filter tokens where length > 2 to remove stop words"]
+        H["Build allItems array: map herbs with type=herb, principles with type=principle, medicines with type=medicine, each with normalised name and searchable text string"]
+        I["For each item, initialise score=0, iterate over every keyword"]
+        J{"keyword found via String.includes on item.text.toLowerCase?"}
+        K["score += 2 for text body match"]
+        LL["score unchanged for this keyword"]
+        M{"keyword found in item.name.toLowerCase?"}
+        N["score += 5 for name partial match"]
+        O["Continue to dosha check"]
+        P{"item.name.toLowerCase === keyword? Exact match test"}
+        Q["score += 10 for exact name match"]
+        R["Begin dosha disambiguation layer"]
+        S{"Query contains 'vata', 'pitta', or 'kapha' substring?"}
+        T{"item.data.pacify array includes the mentioned dosha?"}
+        U["score += 10: item directly balances the queried dosha"]
+        V{"item.text.toLowerCase includes the dosha string?"}
+        W["score += 3: item at least mentions the dosha"]
+        X["score -= 5: penalty for dosha-irrelevant items"]
+        Y["Skip dosha scoring entirely"]
+        Z["Array.filter: keep only items where score > 5 threshold"]
+        AA["Array.sort by score descending via comparator b.score - a.score"]
+        AB["Array.slice 0 to topK, return scored results to caller"]
+
+        B -->|No| C --> D --> E --> F
+        B -->|Yes| F
+        F --> G --> H --> I --> J
+        J -->|Yes| K --> M
+        J -->|No| LL --> R
+        M -->|Yes| N --> P
+        M -->|No| O --> R
+        P -->|Yes| Q --> R
+        P -->|No| O
+        R --> S
+        S -->|Yes| T
+        T -->|Yes| U --> Z
+        T -->|No| V
+        V -->|Yes| W --> Z
+        V -->|No| X --> Z
+        S -->|No| Y --> Z
+        Z --> AA --> AB
+    end
+
+    AB --> AC
+
+    subgraph UserEnd6 ["User"]
+        AC["Scored results are formatted via formatContext and injected into the AI system prompt"]
+    end
+
+    AC --> STOP(["End"])
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>KnowledgeBase.js</code> (105 lines, singleton via <code>module.exports = new KnowledgeBase()</code>)<br>
+            <strong>Scoring algorithm:</strong> Keyword in text body = +2 pts, keyword in name = +5 pts, exact name match = +10 pts, item pacifies queried dosha = +10 pts, item mentions dosha in text = +3 pts, item unrelated to dosha = −5 pts. Threshold filter removes items scoring ≤ 5.<br>
+            <strong>Output format:</strong> <code>formatContext()</code> produces structured strings per type — herbs include Rasa, Virya, Vipaka, Pacify fields; principles include explanation and clinical importance; medicines include botanical name, dosage, and parts used.
+        </div>
+    </div>
+</section>
+
+
+<footer class="page-footer">
+    <p>AyurVAID AI Module Activity Diagrams — FYP Documentation &nbsp;|&nbsp; <span>6 AI Component Diagrams</span></p>
+</footer>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#6366f1',
+            primaryTextColor: '#f0f2f8',
+            primaryBorderColor: '#4f46e5',
+            lineColor: '#4b5570',
+            secondaryColor: '#1e1b3a',
+            tertiaryColor: '#0f172a',
+            nodeBorder: '#4f46e5',
+            mainBkg: '#1a1f35',
+            textColor: '#e0e4ec',
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif',
+            edgeLabelBackground: '#1a1f35'
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis',
+            padding: 15,
+            nodeSpacing: 30,
+            rankSpacing: 40
+        },
+        securityLevel: 'loose'
+    });
+</script>
+
+</body>
+</html>
