@@ -193,56 +193,24 @@
             <pre class="mermaid">
 sequenceDiagram
     actor User
-    participant Frontend
-    participant Backend as Backend Server
-    participant Analyzer as Dosha Analyzer
-    participant Python as Python ML Script
-    participant Model as CatBoost Model
-    participant SHAP as SHAP Explainer
+    participant App as Web Application
+    participant Analyzer as ML Pipeline
+    participant Model as CatBoost & SHAP
 
-    User->>Frontend: Completes all 25 health questions
-    Frontend->>Backend: POST /api/dosha/analyze with 25 answers
-
-    activate Backend
-    Backend->>Analyzer: Send answers for analysis
+    User->>App: Submits health questions
+    activate App
+    App->>Analyzer: Forward answers for analysis
     activate Analyzer
 
-    Analyzer->>Python: Start prediction script with answers as input
-    activate Python
-
-    Python->>Python: Load saved model and encoders from disk
-    Python->>Python: Convert each text answer into a number
-
-    alt Some answers are missing
-        Python->>Python: Fill in default values
-    end
-
-    Python->>Model: Run prediction on the encoded answers
+    Analyzer->>Model: Predict dosha & compute SHAP importances
     activate Model
-    Model-->>Python: Return probabilities for Vata, Pitta, Kapha
+    Model-->>Analyzer: Returns dosha scores & key feature insights
     deactivate Model
 
-    Python->>Python: Pick Primary dosha (highest probability)
-    Python->>Python: Pick Secondary dosha (second highest)
-    Python->>Python: Determine constitution type (Single, Dual, or Balanced)
-
-    Python->>SHAP: Calculate feature contributions for the prediction
-    activate SHAP
-    SHAP-->>Python: Return how much each answer pushed the result up or down
-    deactivate SHAP
-
-    Python->>Python: Select top 5 supporting and top 3 opposing answers
-    Python-->>Analyzer: Return JSON with scores, dosha type, and explanations
-    deactivate Python
-
-    Analyzer-->>Backend: Return complete analysis result
+    Analyzer-->>App: Returns unified analysis result object
     deactivate Analyzer
-
-    Backend->>Backend: Generate AI Wisdom Summary using LLM
-    Backend-->>Frontend: Return dosha profile with SHAP explanations
-    deactivate Backend
-
-    Frontend-->>User: Display results with explanation of key factors
+    App-->>User: Displays results with visual indicators
+    deactivate App
             </pre>
         </div>
         <div class="section-notes">
@@ -265,64 +233,32 @@ sequenceDiagram
             <pre class="mermaid">
 sequenceDiagram
     actor User
-    participant Frontend
-    participant ChatRoute as Chat Route
-    participant Manager as AI Service Manager
+    participant App as Web Application
+    participant Manager as AI Orchestrator
     participant KB as Knowledge Base
-    participant Gemini as Gemini AI
-    participant RuleAI as Rule-Based AI
+    participant Provider as AI Provider (e.g. Gemini)
 
-    User->>Frontend: Types a health question and sends it
-    Frontend->>ChatRoute: POST /api/chat/message
-
-    activate ChatRoute
-    ChatRoute->>ChatRoute: Build system prompt with dosha profile
-    ChatRoute->>ChatRoute: Add recent conversation history
-    ChatRoute->>Manager: Generate a response for this message
-
+    User->>App: Sends a health question
+    App->>Manager: Route message
     activate Manager
 
     Note over Manager,KB: RAG Step - Enrich with knowledge
-    Manager->>KB: Search for relevant herbs, principles, medicines
-    KB-->>Manager: Return matching knowledge items
+    Manager->>KB: Retrieve relevant Ayurvedic context
+    activate KB
+    KB-->>Manager: Return matching herbs & principles
+    deactivate KB
 
-    alt Knowledge items found
-        Manager->>Manager: Attach knowledge context to the message
-    end
+    Manager->>Manager: Inject context into prompt
 
-    alt Gemini is the active provider
-        Manager->>Gemini: Send message with context for a response
-        activate Gemini
-
-        alt Gemini responds successfully
-            Gemini-->>Manager: Return the AI-generated response
-            deactivate Gemini
-        else Gemini fails
-            Gemini-->>Manager: Return error
-            deactivate Gemini
-            Note over Manager: Automatic fallback
-            Manager->>RuleAI: Retry with the Rule-Based AI
-            activate RuleAI
-            RuleAI-->>Manager: Return rule-based response
-            deactivate RuleAI
-            Manager->>Manager: Mark response as coming from backup
-        end
-    else Rule-Based AI is the active provider
-        Manager->>RuleAI: Send message for a response
-        activate RuleAI
-        RuleAI-->>Manager: Return rule-based response
-        deactivate RuleAI
-    end
-
-    Manager-->>ChatRoute: Return response with provider info
+    Manager->>Provider: Forward prompt to active Provider
+    activate Provider
+    Provider-->>Manager: Return AI-generated response
+    deactivate Provider
+    
+    Manager-->>App: Forward finalized response (with Provider badge)
     deactivate Manager
-
-    ChatRoute->>ChatRoute: Generate Explainable AI reasoning
-    ChatRoute->>ChatRoute: Save messages to the database
-    ChatRoute-->>Frontend: Return response with explanation
-    deactivate ChatRoute
-
-    Frontend-->>User: Display the AI response in the chat
+    
+    App-->>User: Display the AI response in chat
             </pre>
         </div>
         <div class="section-notes">
@@ -344,52 +280,25 @@ sequenceDiagram
         <div class="diagram-container">
             <pre class="mermaid">
 sequenceDiagram
-    participant Manager as AI Service Manager
-    participant Gemini as Gemini AI Provider
-    participant API as Google Gemini API
+    participant Manager as AI Orchestrator
+    participant Gemini as Gemini Provider
+    participant API as External LLM API
 
-    Manager->>Gemini: Generate response for user message
+    Manager->>Gemini: Request response generation
     activate Gemini
 
-    Gemini->>Gemini: Check if API key is configured
+    Gemini->>Gemini: Build customized system instructions
+    Gemini->>Gemini: Inject retrieved RAG context & Dosha Profile
+    Gemini->>Gemini: Append sanitised conversation history
 
-    alt API key is missing
-        Gemini-->>Manager: Return error - Gemini not configured
-    else API key is present
-        Gemini->>Gemini: Build Ayurvedic advisor instructions
+    Gemini->>API: Send engineered prompt payload
+    activate API
+    API-->>Gemini: Return generated text
+    deactivate API
 
-        alt User has a dosha profile
-            Gemini->>Gemini: Add dosha type and scores to instructions
-        end
-
-        alt RAG context was attached
-            Gemini->>Gemini: Merge knowledge base context into instructions
-        end
-
-        Gemini->>Gemini: Prepare conversation history
-        Gemini->>Gemini: Clean up history so messages alternate user and AI
-
-        loop Retry up to 3 times if busy
-            Gemini->>API: Send question with instructions and history
-            activate API
-
-            alt API responds successfully
-                API-->>Gemini: Return generated health advice
-                deactivate API
-            else API is busy or rate limited
-                API-->>Gemini: Return rate limit error
-                deactivate API
-                Gemini->>Gemini: Wait before retrying (2s, then 4s, then 8s)
-            else Other error occurs
-                API-->>Gemini: Return error
-                deactivate API
-                Gemini-->>Manager: Pass the error back
-            end
-        end
-
-        Gemini->>Gemini: Package response with model name and token count
-        Gemini-->>Manager: Return the personalised response
-    end
+    Gemini->>Gemini: Format response with tracking stats
+    Gemini-->>Manager: Return output string
+    deactivate Gemini
 
     deactivate Gemini
             </pre>
@@ -413,50 +322,23 @@ sequenceDiagram
         <div class="diagram-container">
             <pre class="mermaid">
 sequenceDiagram
-    participant Manager as AI Service Manager
-    participant RuleAI as Rule-Based AI
-    participant KnowData as Ayurvedic Knowledge Data
+    participant Manager as AI Orchestrator
+    participant RuleAI as Rule-Based Engine
     participant KB as Knowledge Base
 
-    Manager->>RuleAI: Generate response for user message
+    Manager->>RuleAI: Request response generation
     activate RuleAI
 
-    RuleAI->>RuleAI: Extract the latest user message
-
-    alt User has a dosha profile
-        RuleAI->>RuleAI: Use primary dosha from profile
-    else Message mentions a dosha name
-        RuleAI->>RuleAI: Detect dosha from the message text
-    else No dosha info available
-        RuleAI->>RuleAI: Will provide general advice
-    end
-
-    RuleAI->>RuleAI: Classify the question topic by matching keywords
-    Note over RuleAI: Topics: food, exercise, sleep, stress, digestion, lifestyle, general
-
-    RuleAI->>RuleAI: Extract context (time of day, urgency, season, symptoms)
-
-    alt Dosha is known
-        RuleAI->>KnowData: Fetch dosha-specific foods, routines, and yoga practices
-        activate KnowData
-        KnowData-->>RuleAI: Return matching recommendations
-        deactivate KnowData
-        RuleAI->>RuleAI: Build personalised response for the detected topic
-    else No dosha known
-        RuleAI->>RuleAI: Build a general Ayurvedic response
-    end
-
-    RuleAI->>KB: Search for additional expert info on this topic
+    RuleAI->>RuleAI: Determine subject intent & extract core topic
+    RuleAI->>RuleAI: Extract referenced Dosha from context
+    
+    RuleAI->>KB: Search best guidelines/recipes for Topic + Dosha
     activate KB
-    KB-->>RuleAI: Return relevant herbs, principles, or medicines
+    KB-->>RuleAI: Return static curated recommendations
     deactivate KB
 
-    alt Expert info found
-        RuleAI->>RuleAI: Append Expert Insights section to the response
-    end
-
-    RuleAI->>RuleAI: Generate explanation with reasoning and sources
-    RuleAI-->>Manager: Return message, explanation, and usage stats
+    RuleAI->>RuleAI: Construct response utilizing static templating
+    RuleAI-->>Manager: Reply indicating localized processing
     deactivate RuleAI
             </pre>
         </div>
@@ -479,57 +361,21 @@ sequenceDiagram
         <div class="diagram-container">
             <pre class="mermaid">
 sequenceDiagram
-    participant Manager as AI Service Manager
-    participant KB as Knowledge Base
-    participant Files as Data Files
-    participant Provider as AI Provider
+    participant Manager as AI Orchestrator
+    participant KB as In-Memory Database
+    participant API as External Generation
 
-    Note over Manager: User message received
-
-    Manager->>Manager: Extract the latest user question
-    Manager->>KB: Search for matching knowledge (top 3 results)
+    Manager->>KB: Search documents via keywords extraction
     activate KB
-
-    alt Knowledge Base not yet loaded
-        KB->>Files: Read herbs.json
-        Files-->>KB: Return herbs data
-        KB->>Files: Read principles.json
-        Files-->>KB: Return Ayurvedic principles
-        KB->>Files: Read medicines.json
-        Files-->>KB: Return traditional medicines
-        KB->>KB: Store all data in memory for future searches
-    end
-
-    KB->>KB: Break question into keywords
-    KB->>KB: Score each item by keyword matches
-    KB->>KB: Apply dosha-specific boosting if a dosha is mentioned
-    KB->>KB: Filter out low-scoring items
-    KB->>KB: Sort and pick the top 3 results
-    KB-->>Manager: Return scored results (herbs, principles, or medicines)
+    KB->>KB: Parse logic & compute weighting factor
+    KB-->>Manager: Resolve with top 3 domain nodes
     deactivate KB
 
-    alt Relevant knowledge found
-        Manager->>Manager: Format items into readable context
-        Manager->>Manager: Create summary with herb names, properties, and uses
-
-        alt System message already exists in the conversation
-            Manager->>Manager: Append knowledge context to existing instructions
-        else No system message yet
-            Manager->>Manager: Create new instructions with knowledge context
-        end
-
-        Manager->>Provider: Send enriched message to the AI provider
-        activate Provider
-        Provider-->>Manager: Response grounded in specific Ayurvedic knowledge
-        deactivate Provider
-    else No matching knowledge
-        Manager->>Provider: Send original message without extra context
-        activate Provider
-        Provider-->>Manager: Response based on general AI knowledge only
-        deactivate Provider
-    end
-
-    Note over Manager: Return final response to the chat route
+    Manager->>Manager: Intertwine extracted facts to prompt
+    Manager->>API: Generate payload request including contexts
+    activate API
+    API-->>Manager: Respond matching RAG criteria constraint
+    deactivate API
             </pre>
         </div>
         <div class="section-notes">
@@ -551,51 +397,19 @@ sequenceDiagram
         <div class="diagram-container">
             <pre class="mermaid">
 sequenceDiagram
-    participant Caller as Calling Module
-    participant KB as Knowledge Base
-    participant Herbs as Herbs Database
-    participant Principles as Principles Database
-    participant Medicines as Medicines Database
+    participant Caller as Orchestrator Component
+    participant KB as NLP Knowledge Engine
 
-    Caller->>KB: Search for a given question
+    Caller->>KB: Request query vectorization
     activate KB
 
-    alt Data not yet loaded into memory
-        KB->>Herbs: Load herbs.json from disk
-        Herbs-->>KB: Return array of herbs with names and properties
-        KB->>Principles: Load principles.json from disk
-        Principles-->>KB: Return array of Ayurvedic principles
-        KB->>Medicines: Load medicines.json from disk
-        Medicines-->>KB: Return array of traditional medicines
-        KB->>KB: Mark data as loaded
-    end
+    KB->>KB: Strip language invariants & generate tokens
+    KB->>KB: Assess textual keyword relevance metric (+2)
+    KB->>KB: Assess rigid entity naming metric (+10)
+    KB->>KB: Assign specific dosha balancing bias weights
 
-    KB->>KB: Split the question into keywords (remove short words)
-    KB->>KB: Combine all herbs, principles, and medicines into one list
-
-    loop For each item in the combined list
-        KB->>KB: Check each keyword against item text (+2 points per match)
-        KB->>KB: Check if keyword appears in item name (+5 points)
-        KB->>KB: Check if item name exactly matches a keyword (+10 points)
-    end
-
-    alt Question mentions a specific dosha
-        loop For each scored item
-            alt Item is known to balance that dosha
-                KB->>KB: Boost score by 10 points
-            else Item mentions the dosha in its text
-                KB->>KB: Boost score by 3 points
-            else Item is unrelated to that dosha
-                KB->>KB: Reduce score by 5 points
-            end
-        end
-    end
-
-    KB->>KB: Remove all items scoring 5 or below
-    KB->>KB: Sort remaining items from highest to lowest score
-    KB->>KB: Take the top results (usually top 3)
-
-    KB-->>Caller: Return the best matching items with scores
+    KB->>KB: Sort array descending iteratively
+    KB-->>Caller: Terminate querying and yield dataset
     deactivate KB
             </pre>
         </div>
