@@ -96,4 +96,51 @@ router.post('/logout', authenticateToken, (req, res) => {
   });
 });
 
+// Update email
+router.put('/update-email', authenticateToken, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required' });
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid email address' });
+    }
+
+    const updatedEmail = await User.updateEmail(req.user.id, email);
+    res.json({ success: true, message: 'Email updated successfully', email: updatedEmail });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// Update password
+router.put('/update-password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, error: 'Current and new password are required' });
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: 'New password must be at least 6 characters long' });
+    }
+
+    await User.updatePassword(req.user.id, currentPassword, newPassword);
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// Delete account
+router.delete('/delete-account', authenticateToken, async (req, res) => {
+  try {
+    await User.deleteAccount(req.user.id);
+    res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

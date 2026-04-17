@@ -86,6 +86,41 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  const updateEmail = async (newEmail) => {
+    try {
+      const response = await axios.put('/api/auth/update-email', { email: newEmail });
+      if (response.data.success) {
+        setUser({ ...user, email: response.data.email });
+        return { success: true };
+      }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to update email' };
+    }
+  };
+
+  const updatePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await axios.put('/api/auth/update-password', { currentPassword, newPassword });
+      if (response.data.success) {
+        return { success: true };
+      }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to update password' };
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      const response = await axios.delete('/api/auth/delete-account');
+      if (response.data.success) {
+        logout();
+        return { success: true };
+      }
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to delete account' };
+    }
+  };
+
   const value = {
     user,
     token,
@@ -93,6 +128,9 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateEmail,
+    updatePassword,
+    deleteAccount,
     isAuthenticated: !!user
   };
 

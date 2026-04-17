@@ -94,6 +94,53 @@ class User {
     return safeUser;
   }
 
+  // Account management
+  async updateEmail(userId, newEmail) {
+    if (!db) throw new Error('Firebase Database not initialized');
+    const emailLowerCase = newEmail.toLowerCase();
+    
+    const snapshot = await db.collection('users').where('email', '==', emailLowerCase).get();
+    if (!snapshot.empty) {
+      const userDoc = snapshot.docs[0];
+      if (userDoc.id !== userId) {
+        throw new Error('Email is already in use by another account');
+      }
+    }
+    
+    await db.collection('users').doc(userId).update({ email: emailLowerCase });
+    return emailLowerCase;
+  }
+
+  async updatePassword(userId, currentPassword, newPassword) {
+    if (!db) throw new Error('Firebase Database not initialized');
+    
+    const userDocRef = db.collection('users').doc(userId);
+    const doc = await userDocRef.get();
+    if (!doc.exists) throw new Error('User not found');
+    
+    const user = doc.data();
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isValidPassword) {
+      throw new Error('Incorrect current password');
+    }
+    
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    
+    await userDocRef.update({ password: hashedPassword });
+    return true;
+  }
+
+  async deleteAccount(userId) {
+    if (!db) throw new Error('Firebase Database not initialized');
+    // First, try to clean up user's subcollections if possible (for production, a Cloud Function is better)
+    // For now, we delete the user document
+    await db.collection('users').doc(userId).delete();
+    return true;
+  }
+
+
   // Profile management
   async addUserProfile(userId, profileData) {
     if (!db) throw new Error('Firebase Database not initialized');

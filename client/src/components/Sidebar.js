@@ -299,12 +299,14 @@ const Sidebar = ({
       <div className="sidebar-footer">
         <AnimatePresence>
           {!isCollapsed && (
-            <motion.div
-              className="user-info"
+            <motion.button
+              className={`user-info ${currentScreen === 'account' ? 'active-account-btn' : ''}`}
+              onClick={() => onNavigate('account')}
               variants={contentVariants}
               initial="collapsed"
               animate="expanded"
               exit="collapsed"
+              style={{ border: 'none', background: 'none', cursor: 'pointer', outline: 'none', display: 'flex' }}
             >
               <div className="user-avatar">
                 {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
@@ -317,7 +319,7 @@ const Sidebar = ({
                   {user?.email}
                 </div>
               </div>
-            </motion.div>
+            </motion.button>
           )}
         </AnimatePresence>
 

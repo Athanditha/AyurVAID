@@ -11,6 +11,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import AssessmentScreen from './components/AssessmentScreen';
 import ResultsScreen from './components/ResultsScreen';
 import ChatScreen from './components/ChatScreen';
+import AccountScreen from './components/AccountScreen';
 import LoadingOverlay from './components/LoadingOverlay';
 import './App.css';
 
@@ -141,6 +142,10 @@ function AppContent() {
             setConversationId={setConversationId}
             onMessageSent={() => setSidebarRefreshTrigger(prev => prev + 1)}
           />
+        );
+      case 'account':
+        return (
+          <AccountScreen />
         );
       case 'settings':
         return (
