@@ -9,7 +9,7 @@
       import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
       mermaid.initialize({ 
           startOnLoad: true, 
-          theme: 'dark',
+          theme: 'default',
           flowchart: {
               useMaxWidth: true,
               htmlLabels: true,
@@ -20,13 +20,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0e17;
-            --surface: #111827;
-            --border: #1e293b;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --accent: #6366f1;
-            --accent-glow: rgba(99,102,241,.15);
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-dim: #475569;
+            --accent: #4f46e5;
+            --accent-glow: rgba(79,70,229,.1);
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -96,10 +96,10 @@
         .mermaid {
             display: flex;
             justify-content: center;
-            background: rgba(0,0,0,0.2);
+            background: #ffffff;
             padding: 20px;
             border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
         }
         footer {
             text-align: center;
@@ -127,16 +127,16 @@
         <div class="mermaid">
 flowchart TD
     %% Define Styles
-    classDef frontend fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#e2e8f0;
-    classDef backend fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#e2e8f0;
-    classDef ml fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#e2e8f0;
-    classDef db fill:#0f172a,stroke:#f43f5e,stroke-width:2px,color:#e2e8f0;
-    classDef ext fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#e2e8f0;
+    classDef frontend fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e,font-weight:bold,rx:5px,ry:5px;
+    classDef backend fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d,font-weight:bold,rx:5px,ry:5px;
+    classDef ml fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f,font-weight:bold,rx:5px,ry:5px;
+    classDef db fill:#ffe4e6,stroke:#e11d48,stroke-width:2px,color:#881337,font-weight:bold,rx:5px,ry:5px;
+    classDef ext fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#581c87,font-weight:bold,rx:5px,ry:5px;
 
     User((User Devices))
 
     subgraph Client [Frontend Layer - Next.js]
-        WebApp[React Web Application]:::frontend
+        WebApp[Next.js Web Application]:::frontend
     end
 
     subgraph Server [Backend Layer - Express.js Node]
@@ -182,40 +182,60 @@ flowchart TD
     <!-- 2. CONCEPT MAP -->
     <div class="diagram-section">
         <h2>2. System Concept Map</h2>
-        <p class="desc">A semantic graph mapping out the domain terms, application features, and their relational dependencies within the Ayurvedic intelligence ecosystem.</p>
+        <p class="desc">A structured semantic graph mapping out the domain terms, application features, and their relational dependencies within the Ayurvedic intelligence ecosystem.</p>
         <div class="mermaid">
-flowchart LR
+flowchart TD
     %% Styles
-    classDef entity fill:#1e293b,stroke:#a855f7,stroke-width:2px;
-    classDef process fill:#1e293b,stroke:#06b6d4,stroke-width:2px;
-    classDef logic fill:#164e63,stroke:#22d3ee,stroke-width:2px;
+    classDef entity fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843,font-weight:bold,rx:10px,ry:10px;
+    classDef process fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e,font-weight:bold,rx:10px,ry:10px;
+    classDef logic fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d,font-weight:bold,rx:10px,ry:10px;
 
+    %% Core Entities
     User([User]):::entity
-    Profile[Dosha Profile]:::entity
-    Assessment[Prakriti Assessment]:::process
-    Chatbot[Ayurvedic Chatbot]:::process
-    Model[CatBoost ML Model]:::logic
-    AIService[AI Service Manager]:::logic
-    RAGBase[Knowledge Base]:::logic
-    XAI[Explainable AI]:::logic
-    Dosha[Prakriti Type: V/P/K]:::entity
+    Profile([Dosha Profile]):::entity
+    Dosha([Prakriti Type]):::entity
+    AyurData([Herbs & Principles]):::entity
 
-    User -- "completes" --> Assessment
-    Assessment -- "processed by" --> Model
-    Model -- "classifies" --> Dosha
-    Model -- "feature relevance" --> XAI
-    Dosha -- "stored in" --> Profile
-    User -- "owns" --> Profile
+    %% Assessment Domain
+    subgraph Assessment_Domain [Assessment Domain]
+        direction TB
+        Assessment[Prakriti Assessment Form]:::process
+        Model{CatBoost ML Model}:::logic
+    end
 
-    User -- "interacts with" --> Chatbot
-    Chatbot -- "orchestrated by" --> AIService
-    AIService -- "incorporates" --> Profile
-    AIService -- "fetches info from" --> RAGBase
-    RAGBase -- "contains" --> Herbs(Ayurvedic Herbs)
-    RAGBase -- "contains" --> Medicines(Medicines & Principles)
-    AIService -- "queries" --> AIProviders(Rasa/Gemini/Custom)
-    AIProviders -- "response enriched by" --> XAI
-    XAI -- "provides transparent reasoning to" --> Chatbot
+    %% Consultation Domain
+    subgraph Consultation_Domain [Consultation Domain]
+        direction TB
+        Chatbot[Ayurvedic Chatbot]:::process
+        Orchestrator{AI Orchestrator}:::logic
+        RAGBase[(Knowledge Base)]:::logic
+        Providers[AI Providers: Gemini/Rasa]:::logic
+    end
+
+    %% Transparency
+    XAI>Explainable AI Engine]:::logic
+
+    %% Flow: User & Profile
+    User -->|completes| Assessment
+    User -->|interacts with| Chatbot
+    User -.->|owns| Profile
+    
+    %% Flow: Assessment ML
+    Assessment -->|analyzed by| Model
+    Model -->|predicts| Dosha
+    Model -.->|generates SHAP rules| XAI
+    Dosha -->|saved to| Profile
+
+    %% Flow: Consultation
+    Chatbot -->|managed by| Orchestrator
+    Orchestrator -.->|contextualizes via| Profile
+    
+    Orchestrator -->|retrieves context from| RAGBase
+    RAGBase -->|contains| AyurData
+    
+    Orchestrator -->|delegates generation to| Providers
+    Providers -->|verified & enriched by| XAI
+    XAI -->|delivers transparency to| Chatbot
         </div>
     </div>
 
@@ -226,8 +246,8 @@ flowchart LR
         <div class="mermaid">
 flowchart LR
     %% Styles
-    classDef actor fill:transparent,stroke:#94a3b8,stroke-width:2px,color:#fff;
-    classDef usecase fill:#1e293b,stroke:#8B5CF6,stroke-width:2px,color:#fff,rx:20,ry:20;
+    classDef actor fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#1e293b;
+    classDef usecase fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95,font-weight:bold,rx:20,ry:20;
 
     %% Actors
     GuestActor((Guest)):::actor

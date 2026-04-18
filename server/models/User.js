@@ -146,8 +146,18 @@ class User {
     if (!db) throw new Error('Firebase Database not initialized');
 
     const profilesRef = db.collection('users').doc(userId).collection('profiles');
-    const newProfileRef = profilesRef.doc();
-    const profileId = newProfileRef.id;
+    const existing = await profilesRef.get();
+    
+    let profileId;
+    let newProfileRef;
+
+    if (!existing.empty) {
+      newProfileRef = existing.docs[0].ref;
+      profileId = newProfileRef.id;
+    } else {
+      newProfileRef = profilesRef.doc();
+      profileId = newProfileRef.id;
+    }
 
     const profile = {
       id: profileId,

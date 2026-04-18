@@ -203,8 +203,17 @@ def predict_dict(input_data):
         }
 
         # 7. Print the results to standard output so Node.js can read them
+        result = {
+            "success": True,
+            "scores": scores,
+            "primary": primary_dosha,
+            "secondary": secondary_dosha,
+            "constitutionType": constitution,
+            "confidence": float(probs[primary_idx]),
+            "engine": "CatBoost_Python",
+            "xai_insights": xai_insights
+        }
         return result
-        
     except Exception as e:
         error_result = {
             "success": False,

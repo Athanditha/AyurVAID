@@ -34,7 +34,7 @@ class GeminiAI {
     let systemInstruction = this._buildSystemPrompt(messages, doshaProfile);
 
     // ── Initialise the model ─────────────────────────────────────────
-    const modelName = options.model || 'gemini-2.0-flash';
+    const modelName = options.model || 'gemini-3.1-pro-preview';
     const model = this.genAI.getGenerativeModel({
       model: modelName,
       systemInstruction,

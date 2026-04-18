@@ -80,7 +80,7 @@ const Dashboard = ({ onStartAssessment, onViewProfile, onStartChat, onViewConver
     }
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="dashboard-loading">
         <div className="spinner"></div>
@@ -125,30 +125,45 @@ const Dashboard = ({ onStartAssessment, onViewProfile, onStartChat, onViewConver
         <motion.div className="quick-actions" variants={itemVariants}>
           <h3>Quick Actions</h3>
           <div className="action-cards">
-            <motion.button
-              className="action-card"
-              onClick={onStartAssessment}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="action-icon">
-                <FileText size={24} />
-              </div>
-              <h4>Take Assessment</h4>
-              <p>Discover or update your dosha profile</p>
-            </motion.button>
+            {profiles.length === 0 ? (
+              <motion.button
+                className="action-card"
+                onClick={onStartAssessment}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="action-icon">
+                  <FileText size={24} />
+                </div>
+                <h4>Take Assessment</h4>
+                <p>Discover your dosha profile</p>
+              </motion.button>
+            ) : (
+              <motion.button
+                className="action-card"
+                onClick={() => onViewProfile(profiles[0])}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="action-icon">
+                  <FileText size={24} />
+                </div>
+                <h4>View Profile</h4>
+                <p>Review your dosha assessment</p>
+              </motion.button>
+            )}
 
             <motion.button
-              className="action-card"
-              onClick={handleNewConversation}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.98 }}
+              className={`action-card ${profiles.length === 0 ? 'disabled-card' : ''}`}
+              onClick={profiles.length === 0 ? () => alert('Please complete your dosha assessment first.') : handleNewConversation}
+              whileHover={profiles.length === 0 ? {} : { y: -4 }}
+              whileTap={profiles.length === 0 ? {} : { scale: 0.98 }}
             >
               <div className="action-icon">
                 <Plus size={24} />
               </div>
               <h4>New Consultation</h4>
-              <p>Start a new AI health conversation</p>
+              <p>{profiles.length === 0 ? 'Assessment required' : 'Start a new AI health conversation'}</p>
             </motion.button>
           </div>
         </motion.div>
@@ -156,15 +171,14 @@ const Dashboard = ({ onStartAssessment, onViewProfile, onStartChat, onViewConver
         {/* Dosha Profiles */}
         <motion.div className="dashboard-section" variants={itemVariants}>
           <div className="section-header">
-            <h3>Your Dosha Profiles</h3>
-            <span className="section-count">{profiles.length}</span>
+            <h3>Your Dosha Profile</h3>
           </div>
           
           {profiles.length === 0 ? (
             <div className="empty-state">
               <FileText size={48} />
-              <h4>No profiles yet</h4>
-              <p>Take your first dosha assessment to get personalized recommendations</p>
+              <h4>No profile yet</h4>
+              <p>Take your dosha assessment to get personalized recommendations and unlock chatting</p>
               <button className="btn btn-primary" onClick={onStartAssessment}>
                 Take Assessment
               </button>
@@ -216,7 +230,10 @@ const Dashboard = ({ onStartAssessment, onViewProfile, onStartChat, onViewConver
               <MessageCircle size={48} />
               <h4>No conversations yet</h4>
               <p>Start your first AI health consultation to get personalized guidance</p>
-              <button className="btn btn-primary" onClick={handleNewConversation}>
+              <button 
+                className="btn btn-primary" 
+                onClick={profiles.length === 0 ? () => alert('Please complete your dosha assessment first.') : handleNewConversation}
+              >
                 Start Consultation
               </button>
             </div>

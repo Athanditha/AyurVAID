@@ -42,13 +42,18 @@ router.post('/message', authenticateToken, async (req, res) => {
       }
     }
 
-    // Get user profile if provided
+    // Always use the user's single dosha profile
     let userProfile = null;
-    if (profileId) {
-      const profile = await User.getUserProfile(req.user.id, profileId);
-      if (profile) {
-        userProfile = profile.analysis;
-      }
+    const profiles = await User.getUserProfiles(req.user.id);
+    if (profiles && profiles.length > 0) {
+      userProfile = profiles[0].analysis;
+    }
+
+    if (!userProfile) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please complete your dosha assessment before starting a consultation.'
+      });
     }
 
     // Add user message to conversation

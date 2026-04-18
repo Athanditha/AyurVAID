@@ -58,6 +58,11 @@ const Sidebar = ({
   };
 
   const handleNewConversation = async () => {
+    if (profiles.length === 0) {
+      alert('Please complete your dosha assessment first.');
+      return;
+    }
+
     try {
       const response = await axios.post('/api/conversations');
       if (response.data.success) {
@@ -131,9 +136,9 @@ const Sidebar = ({
       {/* New Conversation Button */}
       <div className="sidebar-section">
         <button
-          className="new-conversation-btn"
+          className={`new-conversation-btn ${profiles.length === 0 ? 'disabled-btn' : ''}`}
           onClick={handleNewConversation}
-          title={isCollapsed ? "New Conversation" : ""}
+          title={isCollapsed ? (profiles.length === 0 ? "Assessment Required" : "New Conversation") : ""}
         >
           <Plus size={18} />
           <AnimatePresence>
@@ -191,7 +196,7 @@ const Sidebar = ({
           <button
             className={`nav-item ${currentScreen === 'assessment' || currentScreen === 'welcome' ? 'active' : ''}`}
             onClick={() => onNavigate('welcome')}
-            title={isCollapsed ? "Take Assessment" : ""}
+            title={isCollapsed ? (profiles.length === 0 ? "Take Assessment" : "Update Assessment") : ""}
           >
             <FileText size={18} />
             <AnimatePresence>
@@ -202,7 +207,7 @@ const Sidebar = ({
                   animate="expanded"
                   exit="collapsed"
                 >
-                  Take Assessment
+                  {profiles.length === 0 ? "Take Assessment" : "Update Assessment"}
                 </motion.span>
               )}
             </AnimatePresence>
