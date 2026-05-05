@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurVAID System Architecture Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4A7C59;
+            --secondary: #8FCB9B;
+            --dark: #2A3D30;
+            --light: #F5F7F5;
+            --glass: rgba(255, 255, 255, 0.8);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            color: var(--dark);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .module-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tech-stack {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .tech-stack strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            text-align: center;
+            margin: 40px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AyurVAID Architecture</h1>
+        <p class="subtitle">Technical Blueprint of the Ayurvedic RAG Engine</p>
+    </header>
+
+    <!-- Module 1 -->
+    <section class="module-card">
+        <span class="tag">Knowledge Layer</span>
+        <h2>1. Structured Knowledge Base</h2>
+        <p>The foundation of the system is a local, high-fidelity library of Ayurvedic wisdom, extracted from peer-reviewed datasets and classical texts.</p>
+        <div class="grid">
+            <div class="tech-stack">
+                <strong>Assets:</strong>
+                <ul>
+                    <li><strong>herbs.json</strong>: 704 records (Rasa, Virya, Vipaka)</li>
+                    <li><strong>principles.json</strong>: 162 Ayurvedic concepts</li>
+                    <li><strong>medicines.json</strong>: Therapeutic dosages and uses</li>
+                </ul>
+            </div>
+            <div class="tech-stack">
+                <strong>Mechanism:</strong>
+                Data is stored in high-density JSON format for O(1) retrieval speed during system initialization and optimized memory usage.
+            </div>
+        </div>
+    </section>
+
+    <!-- Module 2 -->
+    <section class="module-card">
+        <span class="tag">Retrieval Layer</span>
+        <h2>2. Keyword-Based RAG Engine</h2>
+        <p>A custom-built Retrieval-Augmented Generation (RAG) system that operates entirely locally to ensure 100% uptime and zero API cost.</p>
+        <div class="grid">
+            <div class="tech-stack">
+                <strong>Core Component:</strong>
+                KnowledgeBase.js
+            </div>
+            <div class="tech-stack">
+                <strong>Scoring Algorithm:</strong>
+                Multi-factor Keyword Scoring with <strong>Dosha-Specific Boosting</strong>. If a user query mentions a Dosha, the system prioritizes herbs that balance that specific state.
+            </div>
+        </div>
+    </section>
+
+    <!-- Module 3 -->
+    <section class="module-card">
+        <span class="tag">Intelligence Layer</span>
+        <h2>3. AI Service Manager (Orchestrator)</h2>
+        <p>A unified interface that manages multiple AI providers and handles the "Augmentation" step of RAG.</p>
+        <div class="grid">
+            <div class="tech-stack">
+                <strong>Augmentation Process:</strong>
+                Intercepts user messages, performs a Knowledge Base search, and "stuffs" the retrieved snippets into the AI's system prompt before generation.
+            </div>
+            <div class="tech-stack">
+                <strong>Hybrid Fallback:</strong>
+                Seamlessly switches between Gemini (Cloud), Rasa (NLP), and CustomAI (Local Rules) based on API availability and quota status.
+            </div>
+        </div>
+    </section>
+
+    <!-- Module 4 -->
+    <section class="module-card">
+        <span class="tag">Execution Layer</span>
+        <h2>4. CustomAI (Local Expert)</h2>
+        <p>A rule-based intelligence engine designed to provide expert advice when cloud models are throttled or offline.</p>
+        <div class="grid">
+            <div class="tech-stack">
+                <strong>Personalization:</strong>
+                Detects Doshas (Vata, Pitta, Kapha) in real-time from conversation history or assessment profiles.
+            </div>
+            <div class="tech-stack">
+                <strong>Synthesis:</strong>
+                Combines Ayurvedic reasoning templates with the dynamic data retrieved via RAG to create a human-like, data-grounded response.
+            </div>
+        </div>
+    </section>
+
+    <!-- Module 5 -->
+    <section class="module-card">
+        <span class="tag">Frontend Layer</span>
+        <h2>5. Next.js Glassmorphic UI</h2>
+        <p>A premium, reactive interface that focuses on Explainable AI (xAI) and user engagement.</p>
+        <div class="grid">
+            <div class="tech-stack">
+                <strong>Explainable AI:</strong>
+                Collapsible analysis cards show the "Why" behind every bot response, citing traditional sources and confidence scores.
+            </div>
+            <div class="tech-stack">
+                <strong>State Management:</strong>
+                Real-time sidebar synchronization ensures that new consultations are visible instantly without page reloads.
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="text-align: center; opacity: 0.6; font-size: 0.8rem; margin-top: 40px;">
+            &copy; 2026 AyurVAID Health Intelligence System | Project Documentation
+        </p>
+    </footer>
+</div>
+
+</body>
+</html>

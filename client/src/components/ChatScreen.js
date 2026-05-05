@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, ArrowLeft, Sparkles } from 'lucide-react';
+import { Send, Bot, User, ArrowLeft, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
 import axios from 'axios';
 import './ChatScreen.css';
 
@@ -49,6 +49,7 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
   const [conversation, setConversation] = useState(null);
   const [isLoading, setIsLoadingLocal] = useState(false);
   const [expandedExplanations, setExpandedExplanations] = useState({});
+  const [messageFeedback, setMessageFeedback] = useState({}); // { messageId: 'positive' | 'negative' }
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = (delay = 0) => {
@@ -161,6 +162,23 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
     }
   };
 
+  const handleFeedback = async (messageId, type) => {
+    try {
+      const response = await axios.post('/api/chat/feedback', {
+        conversationId,
+        messageId,
+        feedback: type,
+        rating: type === 'positive' ? 5 : 1
+      });
+
+      if (response.data.success) {
+        setMessageFeedback(prev => ({ ...prev, [messageId]: type }));
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    }
+  };
+
   const messageVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -193,9 +211,35 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
                 )}
                 
                 {message.aiProvider && (
-                  <div className="provider-badge">
-                    <Sparkles size={12} />
-                    <span>{formatProviderName(message.aiProvider)}</span>
+                  <div className="provider-badge-container">
+                    <div className="provider-badge">
+                      <Sparkles size={12} />
+                      <span>{formatProviderName(message.aiProvider)}</span>
+                    </div>
+                    
+                    {message.type === 'bot' && message.aiProvider === 'custom' && (
+                      <div className="feedback-actions">
+                        <button 
+                          className={`feedback-btn ${messageFeedback[message.id] === 'positive' ? 'active positive' : ''}`}
+                          onClick={() => handleFeedback(message.id, 'positive')}
+                          disabled={messageFeedback[message.id]}
+                          title="This was helpful"
+                        >
+                          <ThumbsUp size={14} />
+                        </button>
+                        <button 
+                          className={`feedback-btn ${messageFeedback[message.id] === 'negative' ? 'active negative' : ''}`}
+                          onClick={() => handleFeedback(message.id, 'negative')}
+                          disabled={messageFeedback[message.id]}
+                          title="This was not helpful"
+                        >
+                          <ThumbsDown size={14} />
+                        </button>
+                        {messageFeedback[message.id] && (
+                          <span className="feedback-thanks">Thanks for your feedback!</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
                 

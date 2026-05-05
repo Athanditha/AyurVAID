@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 const ayurvedicKnowledge = require('../data/ayurvedic-knowledge');
@@ -141,6 +143,54 @@ router.post('/switch-provider', authenticateToken, async (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+// Post feedback for a specific AI message
+router.post('/feedback', authenticateToken, async (req, res) => {
+  try {
+    const { conversationId, messageId, feedback, rating, comment } = req.body;
+    
+    if (rating === undefined && !feedback) {
+      return res.status(400).json({ success: false, error: 'Feedback or rating is required' });
+    }
+
+    const dataDir = path.join(__dirname, '../data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    const feedbackPath = path.join(dataDir, 'rule_based_feedback.json');
+    let feedbackStore = [];
+    if (fs.existsSync(feedbackPath)) {
+      try {
+        feedbackStore = JSON.parse(fs.readFileSync(feedbackPath, 'utf8'));
+      } catch (e) {
+        feedbackStore = [];
+      }
+    }
+
+    const feedbackEntry = {
+      id: Date.now().toString(),
+      userId: req.user.id,
+      conversationId,
+      messageId,
+      rating, // 1-5 or boolean-like
+      feedback, // 'positive' | 'negative'
+      comment: comment || '',
+      timestamp: new Date().toISOString()
+    };
+
+    feedbackStore.push(feedbackEntry);
+    fs.writeFileSync(feedbackPath, JSON.stringify(feedbackStore, null, 2));
+
+    res.json({
+      success: true,
+      message: 'Feedback recorded successfully'
+    });
+  } catch (error) {
+    console.error('Feedback error:', error);
+    res.status(500).json({ success: false, error: 'Failed to record feedback' });
   }
 });
 

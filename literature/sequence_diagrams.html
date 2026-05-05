@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurVAID — AI Module Sequence Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e17;
+            color: #e0e4ec;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.06) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+        }
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #10b981);
+            border-radius: 4px;
+        }
+        .page-header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+        .page-header p {
+            margin-top: 0.75rem;
+            color: #8892a8;
+            font-size: 1.05rem;
+            font-weight: 300;
+        }
+
+        .toc {
+            max-width: 720px;
+            margin: 2.5rem auto 3rem;
+            padding: 2rem 2.5rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+        }
+        .toc h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #818cf8;
+            margin-bottom: 1rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .toc ol { list-style: none; counter-reset: toc; padding: 0; }
+        .toc ol li { counter-increment: toc; margin-bottom: 0.55rem; }
+        .toc ol li a {
+            color: #c7d2e8;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.97rem;
+            transition: color 0.2s, padding-left 0.2s;
+            display: inline-block;
+        }
+        .toc ol li a::before {
+            content: counter(toc) ". ";
+            color: #6366f1;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+        .toc ol li a:hover { color: #a5b4fc; padding-left: 6px; }
+
+        .diagram-section {
+            max-width: 1100px;
+            margin: 0 auto 3.5rem;
+            padding: 0 1.5rem;
+        }
+        .section-card {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+        .section-card:hover { border-color: rgba(99,102,241,0.25); }
+        .section-header { padding: 2rem 2.5rem 1.2rem; }
+        .section-header .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+        .badge-ml   { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.25); }
+        .badge-ai   { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+        .badge-data { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+        .section-header h2 { font-size: 1.55rem; font-weight: 700; color: #f0f2f8; margin-bottom: 0.5rem; }
+        .section-header p { color: #8892a8; font-size: 0.92rem; line-height: 1.6; max-width: 700px; }
+
+        .diagram-container { padding: 1.5rem 2rem 2rem; overflow-x: auto; }
+        .diagram-container .mermaid { display: flex; justify-content: center; }
+        .diagram-container .mermaid svg { max-width: 100%; height: auto !important; }
+
+        .section-notes {
+            margin: 0 2rem 2rem;
+            padding: 1.2rem 1.5rem;
+            background: rgba(99,102,241,0.06);
+            border-left: 3px solid #6366f1;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.88rem;
+            color: #a5b4fc;
+        }
+        .section-notes strong { color: #c7d2ff; }
+
+        .page-footer {
+            text-align: center;
+            padding: 3rem 1rem 2.5rem;
+            color: #4b5570;
+            font-size: 0.82rem;
+        }
+        .page-footer span { color: #6366f1; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.8rem; }
+            .section-header { padding: 1.5rem 1.5rem 1rem; }
+            .diagram-container { padding: 1rem; }
+            .section-notes { margin: 0 1rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="page-header">
+    <h1>AyurVAID — AI Module Sequence Diagrams</h1>
+    <p>Sequence diagrams showing the interaction flow between components for each AI module</p>
+</header>
+
+<nav class="toc">
+    <h2>AI Modules</h2>
+    <ol>
+        <li><a href="#catboost">CatBoost Dosha Prediction and SHAP Explanation</a></li>
+        <li><a href="#aimanager">AI Service Manager - Orchestrator</a></li>
+        <li><a href="#gemini">Gemini LLM Provider</a></li>
+        <li><a href="#customai">Rule-Based AI Provider</a></li>
+        <li><a href="#rag">RAG Knowledge Retrieval</a></li>
+        <li><a href="#knowledgebase">Knowledge Base Search</a></li>
+    </ol>
+</nav>
+
+
+<!-- 1. CATBOOST -->
+<section class="diagram-section" id="catboost">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ml">Machine Learning</span>
+            <h2>1. CatBoost Dosha Prediction and SHAP Explanation</h2>
+            <p>Shows the step-by-step message flow from the user submitting their questionnaire answers, through the backend spawning a Python prediction script, to receiving dosha scores and SHAP explanations.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    actor User
+    participant App as Web Application
+    participant Analyzer as ML Pipeline
+    participant Model as CatBoost & SHAP
+
+    User->>App: Submits health questions
+    activate App
+    App->>Analyzer: Forward answers for analysis
+    activate Analyzer
+
+    Analyzer->>Model: Predict dosha & compute SHAP importances
+    activate Model
+    Model-->>Analyzer: Returns dosha scores & key feature insights
+    deactivate Model
+
+    Analyzer-->>App: Returns unified analysis result object
+    deactivate Analyzer
+    App-->>User: Displays results with visual indicators
+    deactivate App
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key files:</strong> <code>catboost_model.py</code>, <code>DoshaAnalyzer.js</code>, <code>routes/dosha.js</code><br>
+            <strong>Note:</strong> The Python script communicates with Node.js by printing JSON to standard output, which the backend reads and parses.
+        </div>
+    </div>
+</section>
+
+
+<!-- 2. AI SERVICE MANAGER -->
+<section class="diagram-section" id="aimanager">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Orchestration</span>
+            <h2>2. AI Service Manager - Orchestrator</h2>
+            <p>Shows how the AI Service Manager receives a user message, enriches it with knowledge base context, routes it to the active AI provider, and handles fallback when the primary provider fails.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    actor User
+    participant App as Web Application
+    participant Manager as AI Orchestrator
+    participant KB as Knowledge Base
+    participant Provider as AI Provider (e.g. Gemini)
+
+    User->>App: Sends a health question
+    App->>Manager: Route message
+    activate Manager
+
+    Note over Manager,KB: RAG Step - Enrich with knowledge
+    Manager->>KB: Retrieve relevant Ayurvedic context
+    activate KB
+    KB-->>Manager: Return matching herbs & principles
+    deactivate KB
+
+    Manager->>Manager: Inject context into prompt
+
+    Manager->>Provider: Forward prompt to active Provider
+    activate Provider
+    Provider-->>Manager: Return AI-generated response
+    deactivate Provider
+    
+    Manager-->>App: Forward finalized response (with Provider badge)
+    deactivate Manager
+    
+    App-->>User: Display the AI response in chat
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key files:</strong> <code>AIServiceManager.js</code>, <code>routes/chat.js</code><br>
+            <strong>Note:</strong> The fallback is automatic and invisible to the user. The response includes a provider badge so the user can see which AI answered.
+        </div>
+    </div>
+</section>
+
+
+<!-- 3. GEMINI LLM PROVIDER -->
+<section class="diagram-section" id="gemini">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Provider</span>
+            <h2>3. Gemini LLM Provider</h2>
+            <p>Shows how the Gemini provider builds a personalised Ayurvedic prompt, prepares conversation history, sends it to Google's Gemini API, and retries automatically if the service is temporarily busy.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    participant Manager as AI Orchestrator
+    participant Gemini as Gemini Provider
+    participant API as External LLM API
+
+    Manager->>Gemini: Request response generation
+    activate Gemini
+
+    Gemini->>Gemini: Build customized system instructions
+    Gemini->>Gemini: Inject retrieved RAG context & Dosha Profile
+    Gemini->>Gemini: Append sanitised conversation history
+
+    Gemini->>API: Send engineered prompt payload
+    activate API
+    API-->>Gemini: Return generated text
+    deactivate API
+
+    Gemini->>Gemini: Format response with tracking stats
+    Gemini-->>Manager: Return output string
+    deactivate Gemini
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>GeminiAI.js</code><br>
+            <strong>Note:</strong> The wait times double each retry (2s, 4s, 8s) — this is called exponential backoff and prevents overloading a busy API.
+        </div>
+    </div>
+</section>
+
+
+<!-- 4. RULE-BASED AI PROVIDER -->
+<section class="diagram-section" id="customai">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-ai">AI Provider</span>
+            <h2>4. Rule-Based AI Provider</h2>
+            <p>Shows how the rule-based engine classifies the user's question by topic, picks a dosha-specific response template, and enriches the reply with expert knowledge from the database.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    participant Manager as AI Orchestrator
+    participant RuleAI as Rule-Based Engine
+    participant KB as Knowledge Base
+
+    Manager->>RuleAI: Request response generation
+    activate RuleAI
+
+    RuleAI->>RuleAI: Determine subject intent & extract core topic
+    RuleAI->>RuleAI: Extract referenced Dosha from context
+    
+    RuleAI->>KB: Search best guidelines/recipes for Topic + Dosha
+    activate KB
+    KB-->>RuleAI: Return static curated recommendations
+    deactivate KB
+
+    RuleAI->>RuleAI: Construct response utilizing static templating
+    RuleAI-->>Manager: Reply indicating localized processing
+    deactivate RuleAI
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>CustomAI.js</code><br>
+            <strong>Note:</strong> This provider runs entirely locally with no API calls, making it always available as a guaranteed fallback.
+        </div>
+    </div>
+</section>
+
+
+<!-- 5. RAG KNOWLEDGE RETRIEVAL -->
+<section class="diagram-section" id="rag">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-data">Data Pipeline</span>
+            <h2>5. RAG Knowledge Retrieval</h2>
+            <p>Shows how the system searches the knowledge base before generating a response, then injects relevant Ayurvedic facts into the AI's instructions so the answer is grounded in verified information.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    participant Manager as AI Orchestrator
+    participant KB as In-Memory Database
+    participant API as External Generation
+
+    Manager->>KB: Search documents via keywords extraction
+    activate KB
+    KB->>KB: Parse logic & compute weighting factor
+    KB-->>Manager: Resolve with top 3 domain nodes
+    deactivate KB
+
+    Manager->>Manager: Intertwine extracted facts to prompt
+    Manager->>API: Generate payload request including contexts
+    activate API
+    API-->>Manager: Respond matching RAG criteria constraint
+    deactivate API
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key files:</strong> <code>KnowledgeBase.js</code>, <code>AIServiceManager.js</code><br>
+            <strong>RAG</strong> means "look up facts first, then generate." This ensures the AI cites real herbs and principles rather than making things up.
+        </div>
+    </div>
+</section>
+
+
+<!-- 6. KNOWLEDGE BASE SEARCH -->
+<section class="diagram-section" id="knowledgebase">
+    <div class="section-card">
+        <div class="section-header">
+            <span class="badge badge-data">Data Layer</span>
+            <h2>6. Knowledge Base Search</h2>
+            <p>Shows inside the search engine: how a question is broken into keywords, scored against every item in the database, boosted for dosha relevance, and filtered down to the best matches.</p>
+        </div>
+        <div class="diagram-container">
+            <pre class="mermaid">
+sequenceDiagram
+    participant Caller as Orchestrator Component
+    participant KB as NLP Knowledge Engine
+
+    Caller->>KB: Request query vectorization
+    activate KB
+
+    KB->>KB: Strip language invariants & generate tokens
+    KB->>KB: Assess textual keyword relevance metric (+2)
+    KB->>KB: Assess rigid entity naming metric (+10)
+    KB->>KB: Assign specific dosha balancing bias weights
+
+    KB->>KB: Sort array descending iteratively
+    KB-->>Caller: Terminate querying and yield dataset
+    deactivate KB
+            </pre>
+        </div>
+        <div class="section-notes">
+            <strong>Key file:</strong> <code>KnowledgeBase.js</code><br>
+            <strong>Scoring:</strong> Text match = +2, Name match = +5, Exact name = +10, Balances queried dosha = +10, Mentions dosha = +3, Unrelated = -5. Threshold is 5 points.
+        </div>
+    </div>
+</section>
+
+
+<footer class="page-footer">
+    <p>AyurVAID AI Module Sequence Diagrams — FYP Documentation &nbsp;|&nbsp; <span>6 AI Component Diagrams</span></p>
+</footer>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#6366f1',
+            primaryTextColor: '#f0f2f8',
+            primaryBorderColor: '#4f46e5',
+            lineColor: '#4b5570',
+            secondaryColor: '#1e1b3a',
+            tertiaryColor: '#0f172a',
+            nodeBorder: '#4f46e5',
+            mainBkg: '#1a1f35',
+            textColor: '#e0e4ec',
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif',
+            actorTextColor: '#f0f2f8',
+            actorBkg: '#1e1b3a',
+            actorBorder: '#6366f1',
+            activationBkgColor: '#2d2a50',
+            activationBorderColor: '#6366f1',
+            signalColor: '#a5b4fc',
+            signalTextColor: '#e0e4ec',
+            noteBkgColor: '#1a1f35',
+            noteTextColor: '#a5b4fc',
+            noteBorderColor: '#4f46e5',
+            labelBoxBkgColor: '#1a1f35',
+            labelTextColor: '#e0e4ec'
+        },
+        sequence: {
+            useMaxWidth: true,
+            diagramMarginX: 20,
+            diagramMarginY: 20,
+            actorMargin: 60,
+            width: 180,
+            height: 50,
+            boxMargin: 10,
+            boxTextMargin: 5,
+            noteMargin: 10,
+            messageMargin: 40,
+            mirrorActors: true,
+            showSequenceNumbers: false
+        },
+        securityLevel: 'loose'
+    });
+</script>
+
+</body>
+</html>

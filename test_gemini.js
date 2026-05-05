@@ -4,12 +4,17 @@ require('dotenv').config();
 async function test() {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Since ListModels is not easily exposed in the standard simple SDK without specific calls,
-    // let's try gemini-pro which is the legacy name, or just do a standard fetch manually
+    // Use gemini-flash-latest as an alternative
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
-    const data = await response.json();
-    console.log(data.models.map(m => m.name));
+    console.log("Sending prompt to Gemini...");
+    const result = await model.generateContent("Hello, can you hear me? Please reply with a short confirmation message.");
+    const response = await result.response;
+    const text = response.text();
+    
+    console.log("\n--- Gemini Response ---");
+    console.log(text);
+    console.log("-----------------------");
   } catch (error) {
     console.error('Error:', error.message);
   }

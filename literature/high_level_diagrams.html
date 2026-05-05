@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurVAID — High Level Architecture & Concept Diagrams</title>
+    <!-- Use Mermaid for Diagram Rendering -->
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ 
+          startOnLoad: true, 
+          theme: 'default',
+          flowchart: {
+              useMaxWidth: true,
+              htmlLabels: true,
+              curve: 'basis'
+          }
+      });
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-dim: #475569;
+            --accent: #4f46e5;
+            --accent-glow: rgba(79,70,229,.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--accent-glow);
+            border: 1px solid rgba(99,102,241,.3);
+            border-radius: 99px;
+            font-size: .8rem;
+            font-weight: 600;
+            color: #818cf8;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin: 0 0 16px 0;
+            background: linear-gradient(135deg, #e2e8f0, #6366f1, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .diagram-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .diagram-section h2 {
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .desc {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="badge">System Diagrams</div>
+        <h1>AyurVAID Architecture</h1>
+        <p class="subtitle">High-Level Architecture Diagram, Concept Map, and System Use Case Diagram detailing the end-to-end data and operational flows.</p>
+    </header>
+
+    <!-- 1. HIGH-LEVEL ARCHITECTURE DIAGRAM -->
+    <div class="diagram-section">
+        <h2>1. High Level Architecture Diagram</h2>
+        <p class="desc">Illustrates the primary structural components of AyurVAID, from the frontend client to AI orchestrators, machine learning models, and external dependencies.</p>
+        <div class="mermaid">
+flowchart TD
+    %% Define Styles
+    classDef frontend fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e,font-weight:bold,rx:5px,ry:5px;
+    classDef backend fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d,font-weight:bold,rx:5px,ry:5px;
+    classDef ml fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f,font-weight:bold,rx:5px,ry:5px;
+    classDef db fill:#ffe4e6,stroke:#e11d48,stroke-width:2px,color:#881337,font-weight:bold,rx:5px,ry:5px;
+    classDef ext fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#581c87,font-weight:bold,rx:5px,ry:5px;
+
+    User((User Devices))
+
+    subgraph Client [Frontend Layer - Next.js]
+        WebApp[Next.js Web Application]:::frontend
+    end
+
+    subgraph Server [Backend Layer - Express.js Node]
+        Router[API Gateway / Router]:::backend
+        Auth[Auth Middleware]:::backend
+        DoshaService[Dosha Analyzer Service]:::backend
+        ChatService[AI Service Manager]:::backend
+        RAG[Knowledge Base / RAG]:::backend
+        XAI[Explainable AI Engine]:::backend
+    end
+
+    subgraph PythonML [Machine Learning Component]
+        CatBoost[CatBoost Classifier script]:::ml
+    end
+
+    subgraph Databases [Persistence & External]
+        Firebase[(Firebase Auth & Firestore)]:::db
+        JSON[(JSON Knowledge Datasets)]:::db
+        LLMHub[External LLMs: Gemini, Rasa]:::ext
+    end
+
+    User -->|HTTP Requests| WebApp
+    WebApp -->|REST API Calls| Router
+    
+    Router --> Auth
+    Auth --> Firebase
+    
+    Router --> DoshaService
+    DoshaService -->|Spawns Child Process| CatBoost
+    CatBoost -->|Returns JSON & SHAP| DoshaService
+    DoshaService --> XAI
+    
+    Router --> ChatService
+    ChatService -->|Retrieves Context| RAG
+    RAG --> JSON
+    ChatService -->|Dispatches Query| LLMHub
+    ChatService --> XAI
+    
+    XAI -->|Provides Transparency| Router
+        </div>
+    </div>
+
+    <!-- 2. CONCEPT MAP -->
+    <div class="diagram-section">
+        <h2>2. System Concept Map</h2>
+        <p class="desc">A structured semantic graph mapping out the domain terms, application features, and their relational dependencies within the Ayurvedic intelligence ecosystem.</p>
+        <div class="mermaid">
+flowchart TD
+    %% Styles
+    classDef entity fill:#fce7f3,stroke:#db2777,stroke-width:2px,color:#831843,font-weight:bold,rx:10px,ry:10px;
+    classDef process fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e,font-weight:bold,rx:10px,ry:10px;
+    classDef logic fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d,font-weight:bold,rx:10px,ry:10px;
+
+    %% Core Entities
+    User([User]):::entity
+    Profile([Dosha Profile]):::entity
+    Dosha([Prakriti Type]):::entity
+    AyurData([Herbs & Principles]):::entity
+
+    %% Assessment Domain
+    subgraph Assessment_Domain [Assessment Domain]
+        direction TB
+        Assessment[Prakriti Assessment Form]:::process
+        Model{CatBoost ML Model}:::logic
+    end
+
+    %% Consultation Domain
+    subgraph Consultation_Domain [Consultation Domain]
+        direction TB
+        Chatbot[Ayurvedic Chatbot]:::process
+        Orchestrator{AI Orchestrator}:::logic
+        RAGBase[(Knowledge Base)]:::logic
+        Providers[AI Providers: Gemini/Rasa]:::logic
+    end
+
+    %% Transparency
+    XAI>Explainable AI Engine]:::logic
+
+    %% Flow: User & Profile
+    User -->|completes| Assessment
+    User -->|interacts with| Chatbot
+    User -.->|owns| Profile
+    
+    %% Flow: Assessment ML
+    Assessment -->|analyzed by| Model
+    Model -->|predicts| Dosha
+    Model -.->|generates SHAP rules| XAI
+    Dosha -->|saved to| Profile
+
+    %% Flow: Consultation
+    Chatbot -->|managed by| Orchestrator
+    Orchestrator -.->|contextualizes via| Profile
+    
+    Orchestrator -->|retrieves context from| RAGBase
+    RAGBase -->|contains| AyurData
+    
+    Orchestrator -->|delegates generation to| Providers
+    Providers -->|verified & enriched by| XAI
+    XAI -->|delivers transparency to| Chatbot
+        </div>
+    </div>
+
+    <!-- 3. USE CASE DIAGRAM -->
+    <div class="diagram-section">
+        <h2>3. Use Case Diagram</h2>
+        <p class="desc">A standard UML-style Use Case Diagram highlighting actors and their functional responsibilities, with mapped <code>&laquo;include&raquo;</code> and <code>&laquo;extend&raquo;</code> relationships.</p>
+        <div class="mermaid">
+flowchart LR
+    %% Styles
+    classDef actor fill:#f8fafc,stroke:#475569,stroke-width:2px,color:#1e293b;
+    classDef usecase fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#4c1d95,font-weight:bold,rx:20,ry:20;
+
+    %% Actors
+    GuestActor((Guest)):::actor
+    AuthActor((User)):::actor
+    SysActor((AI System)):::actor
+
+    %% Use Cases Boundary
+    subgraph AyurVAID_System [AyurVAID System]
+        direction TB
+        UC1([Register / Login]):::usecase
+        UC2([Take Prakriti Assessment]):::usecase
+        UC_ML([Predict Dosha with ML]):::usecase
+        UC_XAI([Generate Explanations]):::usecase
+        
+        UC4([Chat with Ayurvedic AI]):::usecase
+        UC_ChatResp([Generate AI Response]):::usecase
+        UC_RAG([Retrieve RAG Context]):::usecase
+        UC_Fallback([Fallback to Rule-Based AI]):::usecase
+        
+        UC5([View Health Dashboard]):::usecase
+    end
+
+    %% Base Associations
+    GuestActor --- UC1
+    AuthActor --- UC1
+    AuthActor --- UC2
+    AuthActor --- UC4
+    AuthActor --- UC5
+
+    SysActor --- UC_ML
+    SysActor --- UC_XAI
+    SysActor --- UC_ChatResp
+
+    %% Includes & Extends
+    UC2 -.->|«include»| UC_ML
+    UC_ML -.->|«include»| UC_XAI
+    
+    UC4 -.->|«include»| UC_ChatResp
+    UC_ChatResp -.->|«include»| UC_XAI
+    
+    UC_RAG -.->|«extend»| UC_ChatResp
+    UC_Fallback -.->|«extend»| UC_ChatResp
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>AyurVAID — Enterprise Architectural Documentation</p>
+</footer>
+
+</body>
+</html>
