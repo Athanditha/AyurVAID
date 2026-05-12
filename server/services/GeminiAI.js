@@ -34,13 +34,13 @@ class GeminiAI {
     let systemInstruction = this._buildSystemPrompt(messages, doshaProfile);
 
     // ── Initialise the model ─────────────────────────────────────────
-    const modelName = options.model || 'gemini-3.1-pro-preview';
+    const modelName = options.model || 'gemini-2.5-flash';
     const model = this.genAI.getGenerativeModel({
       model: modelName,
       systemInstruction,
       generationConfig: {
         temperature: options.temperature ?? 0.7,
-        maxOutputTokens: options.max_tokens ?? 800,
+        maxOutputTokens: options.max_tokens ?? 4096,
         topP: 0.9,
         topK: 40,
       },
@@ -120,7 +120,7 @@ CORE DIRECTIVES:
 2. Use Markdown formatting (bold, lists, headings) for clear, readable responses.
 3. Reference specific herbs, foods, and practices from the Ayurvedic pharmacopoeia.
 4. Always include safety disclaimers when discussing health conditions — recommend consulting healthcare professionals for serious issues.
-5. Be warm, supportive, and interactive. Keep responses between 200-500 words.
+5. Be warm, supportive, and interactive. Keep responses VERY concise and direct, ideally no more than 2-3 short paragraphs (100-200 words).
 6. When discussing dietary advice, mention the Rasa (taste), Virya (potency), and Vipaka (post-digestive effect) of key foods/herbs.
 7. Consider seasonal (Ritucharya) and daily routine (Dinacharya) context.`;
 

@@ -80,7 +80,8 @@ router.post('/message', authenticateToken, async (req, res) => {
       type: 'bot',
       content: aiResponse.message,
       explanation: comprehensiveExplanation,
-      doshaContext: aiResponse.doshaContext
+      doshaContext: aiResponse.doshaContext,
+      aiProvider: aiResponse.aiProvider
     });
 
     res.json({
@@ -273,7 +274,7 @@ INSTRUCTIONS:
 7. Mention relevant herbs or practices from the knowledge base
 8. Be supportive and encouraging while being scientifically accurate
 9. If discussing serious health conditions, recommend consulting healthcare professionals
-10. Keep responses informative but concise (300-500 words)
+10. Keep responses informative but VERY concise (100-200 words max, ideally 2-3 short paragraphs)
 
 Remember: You are providing educational information based on traditional Ayurvedic principles and modern research, not medical diagnosis or treatment.`;
 
@@ -298,7 +299,7 @@ Remember: You are providing educational information based on traditional Ayurved
 
     // Use AI Service Manager instead of direct OpenAI call
     const aiResponse = await aiServiceManager.generateResponse(messages, doshaAnalysis, {
-      max_tokens: 600,
+      max_tokens: 4096,
       temperature: 0.7
     });
 

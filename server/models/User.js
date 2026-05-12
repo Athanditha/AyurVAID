@@ -242,12 +242,15 @@ class User {
       conversation.messages = [];
     }
 
+    // Remove undefined properties to satisfy Firestore constraints
+    const cleanMessage = Object.fromEntries(
+      Object.entries(message).filter(([, value]) => value !== undefined)
+    );
     const msgObj = {
       id: Date.now(),
-      ...message,
+      ...cleanMessage,
       timestamp: new Date().toISOString()
     };
-
     conversation.messages.push(msgObj);
     conversation.updatedAt = new Date().toISOString();
 
