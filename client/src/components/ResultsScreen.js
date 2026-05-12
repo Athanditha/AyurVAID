@@ -114,10 +114,38 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
                  </div>
              )}
           </div>
+          <div className="recommendations">
+            <div className="recommendation-card diet-card">
+              <div className="rec-header">
+                <Utensils size={20} className="rec-icon" />
+                <h5>Dietary Guidelines</h5>
+              </div>
+              <ul className="rec-list">
+                {recommendations?.diet?.map((item, index) => (
+                  <li key={`diet-${index}`}>
+                    <span className="rec-bullet"></span>
+                    {item}
+                  </li>
+                )) || <p>Personalized diet guidelines are being generated.</p>}
+              </ul>
+            </div>
+
+            <div className="recommendation-card lifestyle-card">
+              <div className="rec-header">
+                <Home size={20} className="rec-icon" />
+                <h5>Lifestyle Adjustments</h5>
+              </div>
+              <ul className="rec-list">
+                {recommendations?.lifestyle?.map((item, index) => (
+                  <li key={`lifestyle-${index}`}>
+                    <span className="rec-bullet"></span>
+                    {item}
+                  </li>
+                )) || <p>Personalized lifestyle routines are being generated.</p>}
+              </ul>
+            </div>
+          </div>
         </motion.div>
-
-
-
           <motion.button
             className="btn btn-primary chat-button"
             onClick={onStartChat}
