@@ -184,36 +184,32 @@ const Dashboard = ({ onStartAssessment, onViewProfile, onStartChat, onViewConver
               </button>
             </div>
           ) : (
-            <div className="profiles-grid">
-              {profiles.map((profile, index) => (
+            <div className="single-profile-container">
                 <motion.div
-                  key={profile.id}
                   className="profile-card"
-                  onClick={() => onViewProfile(profile)}
+                  onClick={() => onViewProfile(profiles[0])}
                   whileHover={{ y: -2 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
                 >
                   <div className="profile-header">
                     <User size={20} />
                     <span className="profile-date">
-                      {new Date(profile.createdAt).toLocaleDateString()}
+                      {new Date(profiles[0].createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="profile-doshas">
                     <div className="dosha-primary">
-                      Primary: {profile.analysis.primary.toUpperCase()} ({profile.analysis.scores[profile.analysis.primary]}%)
+                      Primary: {profiles[0].analysis.primary.toUpperCase()} ({profiles[0].analysis.scores[profiles[0].analysis.primary]}%)
                     </div>
                     <div className="dosha-secondary">
-                      Secondary: {profile.analysis.secondary.toUpperCase()} ({profile.analysis.scores[profile.analysis.secondary]}%)
+                      Secondary: {profiles[0].analysis.secondary.toUpperCase()} ({profiles[0].analysis.scores[profiles[0].analysis.secondary]}%)
                     </div>
                   </div>
                   <div className="profile-type">
-                    {profile.analysis.constitutionType}
+                    {profiles[0].analysis.constitutionType}
                   </div>
                 </motion.div>
-              ))}
             </div>
           )}
         </motion.div>

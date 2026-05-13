@@ -89,7 +89,6 @@ const LoginScreen = ({ onSwitchToRegister }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
                 required
               />
             </div>
@@ -105,7 +104,6 @@ const LoginScreen = ({ onSwitchToRegister }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
                 required
               />
               <button

@@ -112,7 +112,6 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  placeholder="First name"
                   required
                 />
               </div>
@@ -128,7 +127,6 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  placeholder="Last name"
                   required
                 />
               </div>
@@ -145,7 +143,6 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
                 required
               />
             </div>
@@ -161,7 +158,6 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Create a password"
                 required
               />
               <button
@@ -184,7 +180,6 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder="Confirm your password"
                 required
               />
               <button

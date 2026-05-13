@@ -72,6 +72,9 @@ const ResultsScreen = ({ userProfile, onStartChat, onBackToDashboard }) => {
                 <div className="dosha-name">
                   {dosha.charAt(0).toUpperCase() + dosha.slice(1)}
                 </div>
+                <div className="dosha-percentage" style={{ fontWeight: '700', fontSize: '1.2rem', color: 'var(--primary-green)', margin: '0.2rem 0' }}>
+                  {scores[dosha]}%
+                </div>
                 <div className="dosha-label">{doshaLabels[dosha]}</div>
               </div>
             ))}
