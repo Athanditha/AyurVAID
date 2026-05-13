@@ -143,22 +143,9 @@ function AppContent() {
             onMessageSent={() => setSidebarRefreshTrigger(prev => prev + 1)}
           />
         );
-      case 'account':
-        return (
-          <AccountScreen />
-        );
       case 'settings':
         return (
-          <div className="settings-placeholder">
-            <h2>Settings</h2>
-            <p>Settings panel coming soon...</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => handleScreenChange('dashboard')}
-            >
-              Back to Dashboard
-            </button>
-          </div>
+          <AccountScreen />
         );
       default:
         return (

@@ -212,6 +212,26 @@ const Sidebar = ({
               )}
             </AnimatePresence>
           </button>
+
+          <button
+            className={`nav-item ${currentScreen === 'settings' ? 'active' : ''}`}
+            onClick={() => onNavigate('settings')}
+            title={isCollapsed ? "Settings" : ""}
+          >
+            <Settings size={18} />
+            <AnimatePresence>
+              {!isCollapsed && (
+                <motion.span
+                  variants={contentVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                >
+                  Settings
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
       </div>
 
@@ -305,8 +325,8 @@ const Sidebar = ({
         <AnimatePresence>
           {!isCollapsed && (
             <motion.button
-              className={`user-info ${currentScreen === 'account' ? 'active-account-btn' : ''}`}
-              onClick={() => onNavigate('account')}
+              className={`user-info ${currentScreen === 'settings' ? 'active-account-btn' : ''}`}
+              onClick={() => onNavigate('settings')}
               variants={contentVariants}
               initial="collapsed"
               animate="expanded"
@@ -329,26 +349,6 @@ const Sidebar = ({
         </AnimatePresence>
 
         <div className="footer-actions">
-          <button
-            className="footer-btn"
-            onClick={() => onNavigate('settings')}
-            title={isCollapsed ? "Settings" : ""}
-          >
-            <Settings size={18} />
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  variants={contentVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                >
-                  Settings
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
-
         </div>
       </div>
       

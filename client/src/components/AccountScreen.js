@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { Mail, Lock, Trash2, Shield, AlertTriangle, User, Calendar } from 'lucide-react';
+import { Mail, Lock, Trash2, Shield, AlertTriangle, User, Calendar, Cpu } from 'lucide-react';
+import AIProviderSettings from './AIProviderSettings';
 import './AccountScreen.css';
 
 const AccountScreen = () => {
@@ -12,6 +13,7 @@ const AccountScreen = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteEmail, setDeleteEmail] = useState('');
   const [deleteStatus, setDeleteStatus] = useState({ status: '', message: '' });
+  const [showAISettings, setShowAISettings] = useState(false);
 
   const handleEmailUpdate = async (e) => {
     e.preventDefault();
@@ -72,8 +74,8 @@ const AccountScreen = () => {
   return (
     <div className="account-screen">
       <div className="account-header">
-        <h1>Account Management</h1>
-        <p>Manage your profile, security settings, and data preferences.</p>
+        <h1>Account & Settings</h1>
+        <p>Manage your profile, security, data preferences, and AI engine settings.</p>
       </div>
 
       <div className="account-grid">
@@ -301,7 +303,36 @@ const AccountScreen = () => {
             )}
           </div>
         </section>
+
+        {/* AI Provider Settings Card */}
+        <section className="account-card">
+          <div className="card-header">
+            <Cpu className="card-icon" style={{ color: '#8b5cf6' }} />
+            <h2>AI Engine Settings</h2>
+          </div>
+          <div className="account-form">
+            <div className="form-group">
+              <p style={{ marginBottom: '1.5rem', color: 'var(--text-medium)', lineHeight: '1.6' }}>
+                Configure the artificial intelligence engine that powers your AyurVAID chatbot. Choose between cloud providers like Gemini or run models locally for enhanced privacy.
+              </p>
+              <button 
+                className="btn btn-outline" 
+                onClick={() => setShowAISettings(true)}
+                style={{ width: '100%' }}
+              >
+                Configure AI Provider
+              </button>
+            </div>
+          </div>
+        </section>
+
       </div>
+      
+      <AnimatePresence>
+        {showAISettings && (
+          <AIProviderSettings onClose={() => setShowAISettings(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
