@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, ArrowLeft, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Send, Bot, User, ArrowLeft, Sparkles, ThumbsUp, ThumbsDown, Cpu, Brain } from 'lucide-react';
 import axios from 'axios';
 import './ChatScreen.css';
 
@@ -50,7 +50,40 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
   const [isTyping, setIsTyping] = useState(false);
   const [expandedExplanations, setExpandedExplanations] = useState({});
   const [messageFeedback, setMessageFeedback] = useState({}); // { messageId: 'positive' | 'negative' }
+  const [currentProvider, setCurrentProvider] = useState('gemini');
+  const [isSwitchingProvider, setIsSwitchingProvider] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Fetch active provider on mount
+  useEffect(() => {
+    const fetchActiveProvider = async () => {
+      try {
+        const response = await axios.get('/api/chat/ai-info');
+        if (response.data.success) {
+          setCurrentProvider(response.data.providerInfo.current);
+        }
+      } catch (error) {
+        console.error('Error fetching active AI provider:', error);
+      }
+    };
+    fetchActiveProvider();
+  }, []);
+
+  const handleSwitchProvider = async (provider) => {
+    if (provider === currentProvider || isSwitchingProvider) return;
+    setIsSwitchingProvider(true);
+    try {
+      const response = await axios.post('/api/chat/switch-provider', { provider });
+      if (response.data.success) {
+        setCurrentProvider(response.data.currentProvider);
+      }
+    } catch (error) {
+      console.error('Error switching AI provider:', error);
+      alert('Failed to switch AI engine: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setIsSwitchingProvider(false);
+    }
+  };
 
   const scrollToBottom = (delay = 0) => {
     setTimeout(() => {
@@ -189,6 +222,37 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
 
   return (
     <div className="chat-container-full">
+      {/* Premium AI Provider Selector Toggle */}
+      <div className="ai-engine-selector-bar">
+        <div className="selector-title">
+          <Cpu size={16} className="sparkles-icon" />
+          <span>Active Intelligence Layer:</span>
+        </div>
+        <div className="selector-options">
+          <button 
+            className={`selector-opt ${currentProvider === 'gemini' ? 'active' : ''}`}
+            onClick={() => handleSwitchProvider('gemini')}
+            disabled={isSwitchingProvider}
+            title="Switch to Gemini LLM for fluent, contextual health guidance"
+          >
+            <Sparkles size={14} />
+            <span>Gemini 1.5 (Hybrid AI)</span>
+          </button>
+          <button 
+            className={`selector-opt ${currentProvider === 'custom' ? 'active' : ''}`}
+            onClick={() => handleSwitchProvider('custom')}
+            disabled={isSwitchingProvider}
+            title="Switch to Custom Rule-Based Engine for transparent, classical wisdom validation"
+          >
+            <Brain size={14} />
+            <span>Rule-Based Engine</span>
+          </button>
+        </div>
+        {isSwitchingProvider && (
+          <div className="selector-loading">Re-routing cognitive pathways...</div>
+        )}
+      </div>
+
       <div className="chat-messages">
         <AnimatePresence>
           {messages.map((message) => (
