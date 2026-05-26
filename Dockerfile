@@ -7,7 +7,7 @@ WORKDIR /app/client
 
 # Copy package descriptors and install dependencies
 COPY client/package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy frontend source code and compile production build
 COPY client/ ./
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy Root/Backend package descriptors and install production node_modules
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production --legacy-peer-deps
 
 # Copy Express Server files and ML datasets
 COPY server/ ./server/

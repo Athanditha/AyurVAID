@@ -5,7 +5,7 @@ WORKDIR /app/client
 
 # Copy package files and install all dependencies (including devDependencies)
 COPY client/package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy client source code and compile Next.js production build
 COPY client/ ./
@@ -19,7 +19,7 @@ WORKDIR /app/client
 
 # Copy package files and install production-only dependencies
 COPY client/package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production --legacy-peer-deps
 
 # Copy compiled Next.js build, static assets, and configuration files
 COPY --from=builder /app/client/.next ./.next
