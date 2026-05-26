@@ -23,6 +23,7 @@ function AppContent() {
   const [conversationId, setConversationId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarRefreshTrigger, setSidebarRefreshTrigger] = useState(0);
+  const [isNewRegistration, setIsNewRegistration] = useState(false);
 
   const { isAuthenticated, loading } = useAuth();
 
@@ -69,6 +70,12 @@ function AppContent() {
     );
   }
 
+  // When a brand-new user registers, redirect them straight to the assessment
+  if (isNewRegistration && isAuthenticated && currentScreen === 'dashboard') {
+    setCurrentScreen('assessment');
+    setIsNewRegistration(false);
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="app-container auth-layout">
@@ -87,7 +94,10 @@ function AppContent() {
               {authMode === 'login' ? (
                 <LoginScreen onSwitchToRegister={() => setAuthMode('register')} />
               ) : (
-                <RegisterScreen onSwitchToLogin={() => setAuthMode('login')} />
+                <RegisterScreen
+                  onSwitchToLogin={() => setAuthMode('login')}
+                  onRegistered={() => setIsNewRegistration(true)}
+                />
               )}
             </motion.div>
           </AnimatePresence>

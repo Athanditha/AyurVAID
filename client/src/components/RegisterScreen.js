@@ -4,7 +4,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './LoginScreen.css';
 
-const RegisterScreen = ({ onSwitchToLogin }) => {
+const RegisterScreen = ({ onSwitchToLogin, onRegistered }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -54,6 +54,8 @@ const RegisterScreen = ({ onSwitchToLogin }) => {
     
     if (!result.success) {
       setError(result.error);
+    } else if (onRegistered) {
+      onRegistered();
     }
     
     setIsLoading(false);

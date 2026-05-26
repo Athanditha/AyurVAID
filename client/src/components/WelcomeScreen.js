@@ -59,10 +59,6 @@ const WelcomeScreen = ({ onStartAssessment }) => {
           premium health guidance tailored just for you.
         </motion.p>
 
-        <motion.div className="welcome-image-container" variants={itemVariants}>
-          <img src="/images/ayurveda_welcome.png" alt="Ayurvedic Balance Illustration" className="welcome-image" />
-        </motion.div>
-
 
         <motion.button
           className="btn btn-primary start-button"
