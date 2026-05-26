@@ -56,6 +56,7 @@ EXPOSE 3000
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV BACKEND_PORT=3001
 ENV PYTHON_API_URL=http://127.0.0.1:8000
 
 # Launch all three services concurrently
