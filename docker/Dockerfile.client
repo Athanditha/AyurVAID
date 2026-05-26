@@ -1,0 +1,36 @@
+# Stage 1: Build the Next.js Frontend
+FROM node:18-slim AS builder
+
+WORKDIR /app/client
+
+# Copy package files and install all dependencies (including devDependencies)
+COPY client/package*.json ./
+RUN npm ci
+
+# Copy client source code and compile Next.js production build
+COPY client/ ./
+ENV NODE_ENV=production
+RUN npm run build
+
+# Stage 2: Runner Stage
+FROM node:18-slim AS runner
+
+WORKDIR /app/client
+
+# Copy package files and install production-only dependencies
+COPY client/package*.json ./
+RUN npm ci --only=production
+
+# Copy compiled Next.js build, static assets, and configuration files
+COPY --from=builder /app/client/.next ./.next
+COPY --from=builder /app/client/public ./public
+COPY --from=builder /app/client/next.config.js ./
+
+# Expose Next.js default port
+EXPOSE 3000
+
+ENV PORT=3000
+ENV NODE_ENV=production
+
+# Start Next.js in production server mode
+CMD ["npm", "run", "start"]

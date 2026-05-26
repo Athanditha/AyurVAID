@@ -56,7 +56,8 @@ class DoshaAnalyzer {
   async runPythonPrediction(inputData) {
     // Attempt to use FastAPI server first for performance
     try {
-      const response = await axios.post('http://127.0.0.1:8000/predict', { data: inputData }, { timeout: 5000 });
+      const pythonApiUrl = process.env.PYTHON_API_URL || 'http://127.0.0.1:8000';
+      const response = await axios.post(`${pythonApiUrl}/predict`, { data: inputData }, { timeout: 5000 });
       return response.data;
     } catch (err) {
       console.warn('FastAPI server unreachable or failed, falling back to spawning python process...', err.message);

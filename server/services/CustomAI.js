@@ -156,8 +156,8 @@ class CustomAI {
   }
 
   generatePersonalizedResponse(intent, context, doshaProfile, userMessage) {
-    const dosha = doshaProfile.primary;
-    const doshaData = ayurvedicKnowledge.doshaProfiles[dosha];
+    const dosha = typeof doshaProfile === 'object' ? doshaProfile.primary : doshaProfile;
+    const doshaData = ayurvedicKnowledge.doshaProfiles[dosha.toLowerCase()];
 
     switch (intent) {
       case 'food':
@@ -331,8 +331,8 @@ class CustomAI {
   }
 
   generateExplanation(intent, doshaProfile, response) {
-    const dosha = doshaProfile.primary;
-    const doshaData = ayurvedicKnowledge.doshaProfiles[dosha];
+    const dosha = typeof doshaProfile === 'object' ? doshaProfile.primary : doshaProfile;
+    const doshaData = ayurvedicKnowledge.doshaProfiles[dosha.toLowerCase()];
 
     return {
       reasoning: [

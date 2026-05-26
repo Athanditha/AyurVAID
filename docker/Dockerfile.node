@@ -1,0 +1,21 @@
+# Use lightweight Node.js slim runtime
+FROM node:18-slim
+
+WORKDIR /app
+
+# Copy package files and install production dependencies
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy the server source and datasets
+COPY server/ ./server/
+COPY datasets/ ./datasets/
+
+# Expose backend API port
+EXPOSE 3001
+
+ENV PORT=3001
+ENV NODE_ENV=production
+
+# Start the Express server
+CMD ["node", "server/server.js"]
