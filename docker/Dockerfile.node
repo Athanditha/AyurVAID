@@ -1,11 +1,11 @@
 # Use lightweight Node.js slim runtime
-FROM node:18-slim
+FROM node:20-slim
 
 WORKDIR /app
 
 # Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --only=production --legacy-peer-deps
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copy the server source and datasets
 COPY server/ ./server/

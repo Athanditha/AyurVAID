@@ -1,23 +1,21 @@
-# =========================================================
 # Stage 1: Build the Next.js Frontend
 # =========================================================
-FROM node:18-slim AS client-builder
+FROM node:20-slim AS client-builder
 
 WORKDIR /app/client
 
 # Copy package descriptors and install dependencies
 COPY client/package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy frontend source code and compile production build
 COPY client/ ./
 ENV NODE_ENV=production
 RUN npm run build
 
-# =========================================================
 # Stage 2: Complete Self-Contained Runtime Stack
 # =========================================================
-FROM node:18-slim AS runner
+FROM node:20-slim AS runner
 
 WORKDIR /app
 
@@ -31,7 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy Root/Backend package descriptors and install production node_modules
 COPY package*.json ./
-RUN npm ci --only=production --legacy-peer-deps
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copy Express Server files and ML datasets
 COPY server/ ./server/
