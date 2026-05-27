@@ -104,6 +104,12 @@ class AIServiceManager {
         
         try {
           const fallbackResponse = await this.generateResponse(messages, doshaProfile, options);
+          this.currentProvider = originalProvider; // Restore original after successful fallback
+          
+          if (fallbackResponse && fallbackResponse.message) {
+            fallbackResponse.message += "\n\n*(Notice: Due to the API key not being responsive, this message was generated with the local Rule-Based Engine.)*";
+          }
+          
           return {
             ...fallbackResponse,
             fallbackUsed: true,
