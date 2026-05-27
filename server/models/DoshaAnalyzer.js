@@ -128,7 +128,10 @@ class DoshaAnalyzer {
     
     return {
       lifestyle: primaryDesc.lifestyle ? Object.values(primaryDesc.lifestyle) : [],
-      dietary: primaryDesc.balancingFoods || { favor: [], avoid: [] },
+      diet: [
+        ...(primaryDesc.balancingFoods?.favor || []).map(item => `Favor: ${item}`),
+        ...(primaryDesc.balancingFoods?.avoid || []).map(item => `Avoid: ${item}`)
+      ],
       exercise: ayurvedicKnowledge.yogaPractices[primary] || [],
       mentalWellness: ayurvedicKnowledge.mentalHealth[primary]?.practices || []
     };
