@@ -53,6 +53,7 @@ class User {
 
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
+    user.id = userDoc.id;
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
@@ -86,7 +87,10 @@ class User {
   async findUserById(userId) {
     if (!db) return null;
     const doc = await db.collection('users').doc(userId).get();
-    return doc.exists ? doc.data() : null;
+    if (!doc.exists) return null;
+    const data = doc.data();
+    data.id = doc.id;
+    return data;
   }
 
   getUserSafeData(user) {
