@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: AyurVAID Hosted Dosha API
+  description: Postman collection for testing the live, hosted AyurVAID Express API on Render.
+  version: 1.0.0
+servers:
+  - url: https://ayurvaid.onrender.com
+    description: Production Environment (Render)
+paths:
+  /api/dosha/analyze:
+    post:
+      summary: Analyze Dosha Assessment (25 Questions)
+      description: |
+        Submits an array of 25 response objects to the Express backend.
+        Each object must contain a `csvColumn` (the feature name) and a `value` (the user's answer).
+        The backend maps these to the CatBoost ML model's expected features.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userInfo:
+                  type: object
+                  description: Optional user metadata
+                  example: { "name": "Test User" }
+                responses:
+                  type: array
+                  description: Array of exactly 25 response objects
+                  items:
+                    type: object
+                    properties:
+                      csvColumn:
+                        type: string
+                      value:
+                        type: string
+                  example: [
+                    { "csvColumn": "Body Frame", "value": "Thin and Lean" },
+                    { "csvColumn": "Type of Hair", "value": "Dry" },
+                    { "csvColumn": "Color of Hair", "value": "Brown" },
+                    { "csvColumn": "Skin", "value": "Dry,Rough" },
+                    { "csvColumn": "Complexion", "value": "Dark" },
+                    { "csvColumn": "Body Weight", "value": "Underweight" },
+                    { "csvColumn": "Nails", "value": "Blackish" },
+                    { "csvColumn": "Size and Color of the Teeth", "value": "Irregular,Blackish" },
+                    { "csvColumn": "Pace of Performing Work", "value": "Fast" },
+                    { "csvColumn": "Mental Activity", "value": "Restless" },
+                    { "csvColumn": "Memory", "value": "Short term" },
+                    { "csvColumn": "Sleep Pattern", "value": "Less" },
+                    { "csvColumn": "Weather Conditions", "value": "Dislike Cold" },
+                    { "csvColumn": "Reaction under Adverse Situations", "value": "Anxiety" },
+                    { "csvColumn": "Mood", "value": "Changes Quickly" },
+                    { "csvColumn": "Eating Habit", "value": "Irregular Chewing" },
+                    { "csvColumn": "Hunger", "value": "Irregular" },
+                    { "csvColumn": "Body Temperature", "value": "Less than Normal" },
+                    { "csvColumn": "Joints", "value": "Weak" },
+                    { "csvColumn": "Nature", "value": "Jealous,Fearful" },
+                    { "csvColumn": "Body Energy", "value": "Low" },
+                    { "csvColumn": "Quality of Voice", "value": "Fast" },
+                    { "csvColumn": "Dreams", "value": "Sky" },
+                    { "csvColumn": "Social Relations", "value": "Introvert" },
+                    { "csvColumn": "Body Odor", "value": "Negligible" }
+                  ]
+      responses:
+        '200':
+          description: Successful analysis with ML prediction, XAI explanation, and Gemini wisdom.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  timestamp:
+                    type: string
+                  analysis:
+                    type: object
+                    properties:
+                      scores:
+                        type: object
+                      primary:
+                        type: string
+                      secondary:
+                        type: string
+                      constitutionType:
+                        type: string
+                      confidence:
+                        type: number
+                      engine:
+                        type: string
+                      xai_insights:
+                        type: object
+                      explanation:
+                        type: object
+                      aiInsight:
+                        type: string
+        '400':
+          description: Bad request (missing or incomplete responses)

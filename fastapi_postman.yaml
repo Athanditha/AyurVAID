@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: FastAPI Dosha Classification Model API
+  description: Postman YAML (OpenAPI spec) for testing the AyurVAID CatBoost ML Microservice.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local Docker Environment
+paths:
+  /predict:
+    post:
+      summary: Predict Dosha based on Symptoms
+      description: Submits a JSON payload of user physical/mental traits to the CatBoost model to return probabilities and primary/secondary Dosha classification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Body Size:
+                  type: string
+                  example: "Slim"
+                Body Weight:
+                  type: string
+                  example: "Low"
+                Height:
+                  type: string
+                  example: "Tall"
+                Bone Structure:
+                  type: string
+                  example: "Light"
+                Complexion:
+                  type: string
+                  example: "Dark"
+                General feel of skin:
+                  type: string
+                  example: "Dry"
+                Texture of Skin:
+                  type: string
+                  example: "Rough"
+                Hair Color:
+                  type: string
+                  example: "Dark Brown"
+                Appearance of Hair:
+                  type: string
+                  example: "Dry"
+                Shape of face:
+                  type: string
+                  example: "Long"
+                Eyes:
+                  type: string
+                  example: "Small"
+                Eyelashes:
+                  type: string
+                  example: "Scanty"
+                Blinking of Eyes:
+                  type: string
+                  example: "Frequent"
+                Cheeks:
+                  type: string
+                  example: "Sunken"
+                Nose:
+                  type: string
+                  example: "Uneven"
+                Teeth and Gums:
+                  type: string
+                  example: "Irregular"
+                Lips:
+                  type: string
+                  example: "Dry"
+                Nails:
+                  type: string
+                  example: "Brittle"
+                Appetite:
+                  type: string
+                  example: "Variable"
+                Liking tastes:
+                  type: string
+                  example: "Sweet"
+      responses:
+        '200':
+          description: Successful prediction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  scores:
+                    type: object
+                    properties:
+                      vata:
+                        type: integer
+                        example: 70
+                      pitta:
+                        type: integer
+                        example: 20
+                      kapha:
+                        type: integer
+                        example: 10
+                  primary:
+                    type: string
+                    example: "vata"
+                  secondary:
+                    type: string
+                    example: "pitta"
+                  constitutionType:
+                    type: string
+                    example: "Single Dosha (Vata)"
+                  confidence:
+                    type: number
+                    example: 0.70123
+                  engine:
+                    type: string
+                    example: "CatBoost_Python"
+                  xai_insights:
+                    type: object
+                    properties:
+                      top_contributors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            feature:
+                              type: string
+                            value:
+                              type: string
+                            contribution:
+                              type: number
+                      counter_indicators:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            feature:
+                              type: string
+                            value:
+                              type: string
+                            contribution:
+                              type: number

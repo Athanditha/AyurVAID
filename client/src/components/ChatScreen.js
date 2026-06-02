@@ -236,7 +236,7 @@ const ChatScreen = ({ userProfile, profileId, conversationId, setIsLoading, onBa
             title="Switch to Gemini LLM for fluent, contextual health guidance"
           >
             <Sparkles size={14} />
-            <span>Gemini 1.5 (Hybrid AI)</span>
+            <span>Gemini 2.5 (Hybrid AI)</span>
           </button>
           <button 
             className={`selector-opt ${currentProvider === 'custom' ? 'active' : ''}`}
