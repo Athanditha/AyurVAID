@@ -9,10 +9,10 @@ AyurVAID is a premium, state-of-the-art AI-powered health intelligence system. I
 Follow these steps to configure and run the AyurVAID ecosystem locally.
 
 ### Prerequisites
-- **Node.js** (v18.x or higher)
-- **Python** (v3.10.x or higher)
+- **Node.js** (v20.x or higher) — *Aligns with the Node 20 Docker containers and Node v24 local development environment defined in the thesis.*
+- **Python** (v3.9 or higher) — *Aligns with the Python 3.9+ environment used for CatBoost and SHAP inference defined in the thesis.*
 - **Firebase Project**: A Firestore database setup with a service account JSON credential.
-- **Gemini API Key**: A valid key from Google AI Studio.
+- **Gemini API Key**: A valid key from Google AI Studio (specifically supporting Gemini 2.5 Flash as specified in the thesis).
 
 ---
 
