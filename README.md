@@ -68,16 +68,28 @@ GEMINI_API_KEY=AIzaSy... # Your Google Gemini API Key
 
 # Python FastAPI Link (defaults to port 8000)
 PYTHON_API_URL=http://127.0.0.1:8000
+
+# Firebase Service Account (optional locally if using the file method, required for cloud hosting)
+# FIREBASE_SERVICE_ACCOUNT={"type": "service_account", ...}
 ```
 
 ---
 
 ### Step 4: Configure Firebase Database
+
+To initialize Firebase, you can use either of the following two methods:
+
+#### Method A: Credentials File (Recommended for Local Development)
 1. Go to your **Firebase Console** > **Project Settings** > **Service Accounts**.
-2. Click **Generate new private key**.
-3. Save the downloaded JSON file in the `/server` directory under the name:
-   `firebase-service-account.json`
-*Note: This file contains secret credentials and is already added to `.gitignore` to prevent leaks.*
+2. Click **Generate new private key** and download the JSON file.
+3. Save it in the `/server` directory under the name `firebase-service-account.json`.
+*Note: This file contains private credentials and is added to `.gitignore` to prevent committing it to GitHub.*
+
+#### Method B: Environment Variable (Required for Cloud Hosting like Render/Heroku)
+1. Copy the **entire JSON contents** of your Firebase service account key.
+2. In your hosting provider's dashboard, add an environment variable:
+   * **Key**: `FIREBASE_SERVICE_ACCOUNT`
+   * **Value**: Paste the copied JSON string.
 
 ---
 
