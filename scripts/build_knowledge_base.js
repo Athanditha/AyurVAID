@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const DATA_DIR = path.join(__dirname, 'server', 'data');
+const DATA_DIR = path.join(__dirname, '..', 'server', 'data');
 const DATASETS = [
   {
     name: 'herbs.json',

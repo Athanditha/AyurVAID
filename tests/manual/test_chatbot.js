@@ -3,7 +3,7 @@
  * Tests: Auth, Chat Pipeline, AI Services, Edge Cases, CustomAI, RasaAI, Gemini Fallback
  */
 
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
@@ -355,7 +355,7 @@ async function suite5_AIServices() {
 
   // 5.1 CustomAI unit test
   try {
-    const CustomAI = require('./services/CustomAI');
+    const CustomAI = require('../../server/services/CustomAI');
     const ai = new CustomAI();
     const msgs = [{ role: 'user', content: 'I need food advice for Vata constitution' }];
     const doshaProfile = { primary: 'vata', secondary: 'pitta', scores: { vata: 65, pitta: 25, kapha: 10 } };
@@ -372,7 +372,7 @@ async function suite5_AIServices() {
 
   // 5.2 CustomAI without dosha profile
   try {
-    const CustomAI = require('./services/CustomAI');
+    const CustomAI = require('../../server/services/CustomAI');
     const ai = new CustomAI();
     const msgs = [{ role: 'user', content: 'How can I sleep better?' }];
     const { result, duration } = await time(() => ai.generateResponse(msgs, null));
@@ -388,7 +388,7 @@ async function suite5_AIServices() {
 
   // 5.3 CustomAI intent classification
   try {
-    const CustomAI = require('./services/CustomAI');
+    const CustomAI = require('../../server/services/CustomAI');
     const ai = new CustomAI();
     const testCases = [
       ['I want to know what to eat', 'food'],
@@ -415,7 +415,7 @@ async function suite5_AIServices() {
 
   // 5.4 RasaAI availability check
   try {
-    const RasaAI = require('./services/RasaAI');
+    const RasaAI = require('../../server/services/RasaAI');
     const rasa = new RasaAI();
     const { result: available, duration } = await time(() => rasa.isAvailable());
     if (available) {
@@ -454,7 +454,7 @@ async function suite5_AIServices() {
 
   // 5.6 RasaAI generativeFallback
   try {
-    const RasaAI = require('./services/RasaAI');
+    const RasaAI = require('../../server/services/RasaAI');
     const rasa = new RasaAI();
     if (rasa.genAI) {
       const msgs = [{ role: 'user', content: 'What herbs help with digestion for a Vata person?' }];
@@ -474,7 +474,7 @@ async function suite5_AIServices() {
 
   // 5.7 AIServiceManager initialization
   try {
-    const AIServiceManager = require('./services/AIServiceManager');
+    const AIServiceManager = require('../../server/services/AIServiceManager');
     const manager = new AIServiceManager();
     await new Promise(r => setTimeout(r, 1000));
     const provider = manager.getCurrentProvider();
@@ -489,7 +489,7 @@ async function suite5_AIServices() {
 
   // 5.8 AIServiceManager generate via current provider
   try {
-    const AIServiceManager = require('./services/AIServiceManager');
+    const AIServiceManager = require('../../server/services/AIServiceManager');
     const manager = new AIServiceManager();
     await new Promise(r => setTimeout(r, 1000));
     const msgs = [
@@ -707,7 +707,7 @@ async function main() {
   };
 
   require('fs').writeFileSync(
-    require('path').join(__dirname, '../test_results.json'),
+    require('path').join(__dirname, 'test_results.json'),
     JSON.stringify(output, null, 2)
   );
 

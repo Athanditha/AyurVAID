@@ -15,7 +15,7 @@ async function capture() {
   });
   
   const page = await browser.newPage();
-  const dir = path.join(__dirname, 'screenshots');
+  const dir = path.join(__dirname, '..', 'screenshots');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
   console.log("Navigating to app...");

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse/sync');
 
-const csvPath = path.join(__dirname, '../datasets/Prakriti.csv');
+const csvPath = path.join(__dirname, '../../datasets/Prakriti.csv');
 
 try {
     const fileContent = fs.readFileSync(csvPath, 'utf8');

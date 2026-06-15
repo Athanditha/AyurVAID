@@ -3,7 +3,7 @@
  * Tests: Rasa connectivity, Gemini API, fallback chain, and full chat pipeline
  */
 
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 const axios = require('axios');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
@@ -152,7 +152,7 @@ async function testGeminiAPI() {
 async function testHybridPipeline(rasaUp, geminiUp) {
   section('TEST 5: Full Hybrid Pipeline (RasaAI class)');
 
-  const RasaAI = require('./services/RasaAI');
+  const RasaAI = require('../../server/services/RasaAI');
   const rasa = new RasaAI();
 
   // Check isAvailable()
@@ -191,7 +191,7 @@ async function testHybridPipeline(rasaUp, geminiUp) {
 async function testGeminiFallbackPath() {
   section('TEST 6: Gemini Standalone Fallback (generativeFallback method)');
 
-  const RasaAI = require('./services/RasaAI');
+  const RasaAI = require('../../server/services/RasaAI');
   const rasa = new RasaAI();
 
   if (!rasa.genAI) {
@@ -221,7 +221,7 @@ async function testGeminiFallbackPath() {
 async function testAIServiceManager() {
   section('TEST 7: AIServiceManager → Rasa Provider');
 
-  const AIServiceManager = require('./services/AIServiceManager');
+  const AIServiceManager = require('../../server/services/AIServiceManager');
   const manager = new AIServiceManager();
 
   // Wait for async initialization

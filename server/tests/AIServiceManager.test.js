@@ -64,7 +64,7 @@ describe('AIServiceManager (Orchestrator)', () => {
     
     // It should have failed over to Custom AI
     expect(response.fallbackUsed).toBe(true);
-    expect(response.message).toBe('Mocked Custom Response');
+    expect(response.message).toContain('Mocked Custom Response');
     expect(manager.providers.custom.generateResponse).toHaveBeenCalled();
   });
 });

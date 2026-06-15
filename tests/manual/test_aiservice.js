@@ -1,6 +1,7 @@
-const AIServiceManager = require('./server/services/AIServiceManager');
-const ayurvedicKnowledge = require('./server/data/ayurvedic-knowledge');
-require('dotenv').config();
+const path = require('path');
+const AIServiceManager = require('../../server/services/AIServiceManager');
+const ayurvedicKnowledge = require('../../server/data/ayurvedic-knowledge');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 async function test() {
   try {

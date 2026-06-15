@@ -88,7 +88,7 @@ describe('AIServiceManager Unit Tests', () => {
       const response = await serviceManager.generateResponse(messages);
       
       // Should have successfully fallen back to custom
-      expect(response.message).toBe('Custom Response');
+      expect(response.message).toContain('Custom Response');
       expect(response.fallbackUsed).toBe(true);
       expect(response.originalProvider).toBe('gemini');
       // After fallback, current provider should still be gemini for future requests

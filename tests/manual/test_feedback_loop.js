@@ -1,7 +1,7 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 async function testFeedbackLoop() {
   const baseURL = 'http://localhost:3001';
@@ -64,7 +64,7 @@ async function testFeedbackLoop() {
     console.log("✅ Feedback Response:", feedbackRes.data);
 
     // Let's read the file to confirm
-    const feedbackPath = path.join(__dirname, 'server', 'data', 'rule_based_feedback.json');
+    const feedbackPath = path.join(__dirname, '..', '..', 'server', 'data', 'rule_based_feedback.json');
     if (fs.existsSync(feedbackPath)) {
       const data = JSON.parse(fs.readFileSync(feedbackPath, 'utf8'));
       console.log("\n--- Content of rule_based_feedback.json ---");
