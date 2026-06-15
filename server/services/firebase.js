@@ -6,7 +6,15 @@ const admin = require('firebase-admin');
 // Also make sure it is added to your .gitignore so it isn't committed remotely.
 
 try {
-  const serviceAccount = require('../firebase-service-account.json');
+  let serviceAccount;
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    // If running in a hosted environment, read from the environment variable
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  } else {
+    // Local development: read from the local file
+    serviceAccount = require('../firebase-service-account.json');
+  }
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -14,8 +22,9 @@ try {
 
   console.log('🔥 Firebase Admin initialized successfully');
 } catch (error) {
-  console.warn('⚠️ Firebase Admin Initialization Warning: Could not find firebase-service-account.json file.');
-  console.warn('Please download it from Firebase Console and place it in the server directory.');
+  console.warn('⚠️ Firebase Admin Initialization Warning: Could not initialize Firebase Admin SDK.');
+  console.warn('Ensure FIREBASE_SERVICE_ACCOUNT environment variable is set or place firebase-service-account.json in the server directory.');
+  console.error('Error detail:', error.message);
 }
 
 const db = admin.firestore?.() || null;
